@@ -1,174 +1,141 @@
-# Your Project Name
+# Personal Portfolio: Sci-Fi Terminal
 
-> **Replace this whole file.** It is a worked example of the README your project
-> will be graded from, not a file to leave as it is. Start with
-> [START-HERE.md](START-HERE.md).
+A personal portfolio for a computer science student, styled after the surveillance-machine interfaces in *Person of Interest*. It is built for recruiters: it shows each project as a problem, the solution that was built, and the tools used, with links to the live app and the source.
 
-One sentence saying what this does and who it is for.
+**Live site:** https://jcdc0.github.io/Personal-Portfolio-SciFiTerminal/
+**API:** not deployed yet (week 2 to 3)
 
-**Live site:** https://yourusername.github.io/your-repo-name/
-**API:** https://your-api.onrender.com/healthz
-**Demo video:** (link)
+> **This deployment is running in demo mode.** The interface is real, but the backend is simulated in your browser, so the site works without a server. See [Demo mode](#demo-mode).
 
-> **This deployment is running in demo mode.** The interface is real; the backend
-> is simulated in your browser so the site works without a server. See
-> [Demo mode](#demo-mode) below. Delete this quote once your API is live.
+![The projects panel](docs/assets/projects.png)
 
-![A screenshot of the main screen](docs/assets/screenshot.png)
+## Features and usage
 
-## What it does
+| Route | What it shows |
+| --- | --- |
+| `/` | Home panel: the handle, a one-line pitch, and buttons to the projects and the contact form |
+| `/projects` | Every project as a card with its summary and tech tags. It shows a loading line, then the cards, or an error with a *Try again* button |
+| `/projects/:id` | One project: the problem, what was built, tech tags, and links to the live site and source code. An unknown id shows "Project not found" |
+| `/about` | Placeholder for the bio, skills and resume download |
+| `/contact` | A contact form (name, email, message). On *Send* it shows "MESSAGE RECEIVED" or the error |
+| anything else | A 404 panel with a link back home |
 
-- Report a sighting with a place, a description and a spookiness rating
-- Browse everything reported, newest first
-- Delete a report
+The header and footer navigation reach every panel, so no page is a dead end.
 
-## Built with
+**The main flow:** open the site, click **View projects**, open a project card, read it, click **Back to projects**, then use **Contact** to send a message.
 
-React and Vite on the front end, Express and PostgreSQL on the back end. The
-client is on GitHub Pages, the API on (host), the database on (host).
+### API
+
+The client calls these through `client/src/api/`. In demo mode they are answered in the browser. The Express versions are the week 2 work.
+
+| Method | Path | What it does |
+| --- | --- | --- |
+| GET | `/api/projects` | List all projects |
+| GET | `/api/projects/:id` | One project, or 404 |
+| POST | `/api/messages` | Save a contact message (`name`, `email` and `message` are required, otherwise 400) |
+
+## Setup and installation
+
+You need **Node.js 20 or newer** (npm comes with it) and **Git**.
+
+1. Get the code:
+
+    ```bash
+    git clone https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal.git
+    cd Personal-Portfolio-SciFiTerminal/client
+    ```
+
+2. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Create your environment file from the example. Use `copy` on Windows and `cp` on macOS or Linux:
+
+    ```bash
+    copy .env.example .env
+    ```
+
+No database is needed yet. The client runs in demo mode until the API exists.
+
+### Environment variables
+
+None of these are committed. `.env.example` lists them with placeholder values.
+
+| Name | Where | Example | What it is |
+| --- | --- | --- | --- |
+| `VITE_USE_MOCK_API` | client, at build time | `true` | Only the exact value `false` turns demo mode off |
+| `VITE_API_BASE_URL` | client, at build time | `http://localhost:3000` | The API's address, no trailing slash. Ignored in demo mode |
+| `DATABASE_URL` | server (week 2) | `postgresql://postgres:devpassword@localhost:5432/portfolio` | PostgreSQL connection string |
+| `CORS_ORIGINS` | server (week 2) | `http://localhost:5173` | Origins allowed to call the API |
+
+Every `VITE_` value is compiled into the public JavaScript, so none of them may hold a password or key.
+
+## How to run it
+
+From the `client` folder:
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173. You should see the Home panel with a yellow **Demo mode** notice under the header. Click **Projects** and five project cards appear after a short loading line.
+
+To build the production version, which is what GitHub Pages serves:
+
+```bash
+npm run build
+```
 
 ## Demo mode
 
-This repository can run two ways, chosen by one environment variable at **build**
-time.
+`VITE_USE_MOCK_API` chooses the backend at build time:
 
-**Demo mode is the default.** Only the exact string `false` turns it off, so a
-forgotten or mistyped variable leaves you on the simulated backend with a visible
-notice rather than on a silently broken build.
-
-| `VITE_USE_MOCK_API` | What happens |
+| Value | What happens |
 | --- | --- |
-| unset, or `true` | The client answers its own requests from `localStorage`. No server, no database, nothing shared between visitors. This is what the template ships with, so the GitHub Pages link works on day one. |
-| `false` | The client calls the Express API at `VITE_API_BASE_URL`, which reads and writes real PostgreSQL. |
+| unset, or `true` | Projects come from `client/src/api/seed.json`, and contact messages are saved to the visitor's own `localStorage`. There is no server and no database. |
+| `false` | The client calls the Express API at `VITE_API_BASE_URL`, which will read and write PostgreSQL. |
 
-**Demo mode is a starting point and a fallback, not a finished project.** Your
-finals submission is all three pieces deployed and talking to each other. Demo
-mode is there so you can build the interface in week one before the API exists,
-and so you have something to show if a free tier is asleep during your demo.
-
-GitHub Pages serves files and cannot run Node, so the API and the database can
-never live there. They go somewhere else:
-
-| Piece | Options |
-| --- | --- |
-| **API** | Render, Railway, Fly.io, Koyeb, a VPS, or [self-hosted behind a tunnel](../content/extending-your-app/11-self-hosting.md) |
-| **Database** | Neon, Supabase, Railway, Aiven, or your own PostgreSQL |
-
-`content/extending-your-app/` in your course workspace walks through all of it.
-Page 10 is the decision page if you do not know which to pick.
-
-## Running it yourself
-
-**The client only, in demo mode.** No database needed.
-
-    cd client
-    npm install
-    cp .env.example .env        # VITE_USE_MOCK_API stays true
-    npm run dev                 # http://localhost:5173
-
-**The whole stack.** Needs a PostgreSQL, either local or hosted.
-
-    # 1. the database
-    docker run --name my-pg -e POSTGRES_PASSWORD=devpassword \
-      -e POSTGRES_DB=haunted -p 5432:5432 -d postgres:17
-
-    # 2. the API
-    cd server
-    npm install
-    cp .env.example .env        # check DATABASE_URL
-    npm run db:reset            # creates the tables and adds sample rows
-    npm run dev                 # http://localhost:3000
-
-    # 3. the client, in another terminal
-    cd client
-    npm install
-    cp .env.example .env
-    # set VITE_USE_MOCK_API=false
-    npm run dev
-
-Check the API on its own before you blame the client:
-
-    curl http://localhost:3000/healthz     # is the process alive
-    curl http://localhost:3000/readyz      # is the database reachable
-    curl http://localhost:3000/api/sightings
-
-## Environment variables
-
-None of these are committed. `.env.example` in each folder lists them with
-placeholder values.
-
-| Name | Where | What it is |
-| --- | --- | --- |
-| `DATABASE_URL` | server | PostgreSQL connection string. Contains a password |
-| `CORS_ORIGINS` | server | comma-separated origins allowed to call the API |
-| `NODE_ENV` | server | `production` on your host |
-| `PORT` | server | **set by the host**, do not set it yourself |
-| `VITE_USE_MOCK_API` | client, at build time | only `false` turns demo mode off; unset means on |
-| `VITE_API_BASE_URL` | client, at build time | your API's public URL, no trailing slash |
-
-Every `VITE_` value is compiled into the built JavaScript and is **public**.
-Never put a key, a password or a connection string in one.
-
-## Deploying
-
-**Client, to GitHub Pages.** Already wired up in
-`.github/workflows/deploy-pages.yml`. Two one-time steps:
-
-1. **Settings > Pages > Build and deployment > Source: GitHub Actions.** Without
-   this the workflow goes green and publishes nothing.
-2. Nothing else, until your API is live. Demo mode is the default, so the first
-   deploy works on its own. When the API is up, add `VITE_USE_MOCK_API` = `false`
-   and `VITE_API_BASE_URL` under **Settings > Secrets and variables > Actions >
-   Variables**, then re-run the workflow.
-
-The repository must be **public** for Pages to serve it on a free account.
-
-**API and database.** Not automated here, because most hosts deploy straight from
-your repository with no workflow at all. Point your host at the `server/` folder,
-set the environment variables in its dashboard, and run `server/db/schema.sql`
-once against the hosted database.
+Both implementations (`mockApi.js` and `httpApi.js`) export the same three functions, `listProjects`, `getProject` and `sendMessage`. That makes switching to the real API a one-variable change.
 
 ## Project structure
 
-    client/          React front end, built by Vite
-      src/api/       ONE interface, two implementations, chosen by a variable
-      src/components/
-    server/          Express API
-      db/            pool, schema.sql, seed.sql, and a runner for them
-    compose.yml      only if you self-host
-    docs/            your planning documents and weekly reports
+```
+client/                 React 18 + Vite front end
+  src/api/              index.js picks mockApi.js or httpApi.js; seed.json holds the project data
+  src/components/       Header, Footer, ProjectCard, DemoNotice
+  src/pages/            one panel per route: Home, Projects, ProjectDetail, About, Contact, NotFound
+  src/styles.css        the Machine (dark) and Samaritan (light) colour tokens
+server/                 Express + PostgreSQL API (still the class template; replaced in week 2)
+docs/assets/            screenshots
+.github/workflows/      builds the client and deploys it to GitHub Pages on every push
+```
 
-## Architecture
+## Screenshots
 
-Three or four sentences, or a small diagram. Which piece talks to which, and
-where each one is hosted.
+| Home | Project detail | Contact |
+| --- | --- | --- |
+| ![Home panel](docs/assets/home.png) | ![Project detail panel](docs/assets/detail.png) | ![Contact panel](docs/assets/contact.png) |
 
-## What I would do next
+## Known issues and next steps
 
-Three honest bullets. This paragraph is worth more than it looks.
-
-## Author
-
-Your name, and a link. Course and section.
+- **The API and database don't exist yet.** `server/` is still the template's sightings API. Next: a `projects` and `messages` schema, `GET /api/projects`, `GET /api/projects/:id` and `POST /api/messages` with parameterised SQL, and then deployment.
+- **The About panel is a placeholder**, and there is no resume download yet.
+- **The *Person of Interest* look is only started.** The colour tokens are in, but the 3D "void" with camera travel between panels, the theme and sound toggles, and the Futura PT and Magda Clean Mono fonts are not built yet.
+- **Project cards have no images yet** (`image_url` is empty for every project).
+- Before the API goes public, the contact endpoint needs an access gate, because it writes to the database.
 
 ## AI use
 
-If you used AI while building this, say so here. Honest disclosure is the
-standard in this course and increasingly outside it, and reporting heavy use
-accurately costs you nothing.
-
-This section is the last 10 points of the finals badge, and it wants three
-things:
-
 ![Built with AI assistance](https://img.shields.io/badge/built%20with-AI%20assistance-0b5fff)
 
-- the badge above, or one you like better
-- a line naming which assistant you used and how much of the work it touched
-- a link to [AI-USAGE.md](AI-USAGE.md), where the full account lives
+Built with help from Claude (Anthropic). It was used for the React routing and page scaffolding and for drafting documentation. The project data and design decisions are my own, and the backend routes and SQL will be too. The full record, with commit links, is in [AI-USAGE.md](AI-USAGE.md).
 
-Keep the detail in `AI-USAGE.md` rather than here. This section is the summary a
-visitor reads; that file is the record the badge is graded from.
+## Author
+
+[JCDC0](https://github.com/JCDC0)
 
 ## Licence
 
-MIT, see [LICENSE](LICENSE). Put your own name in it.
+MIT, see [LICENSE](LICENSE).
