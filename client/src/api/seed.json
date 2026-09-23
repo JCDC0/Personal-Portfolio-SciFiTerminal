@@ -1,8 +1,52 @@
 [
-  { "id": "seed-1", "place": "Library, third floor", "description": "Chairs rearranged overnight, every time. The night guard says he locks the room himself.", "spookiness": 3, "reported_at": "2026-08-01T14:20:00.000Z" },
-  { "id": "seed-2", "place": "Old gym", "description": "Lights flicker in a fixed pattern after 9pm, always three short and one long.", "spookiness": 4, "reported_at": "2026-08-03T11:05:00.000Z" },
-  { "id": "seed-3", "place": "Parking basement", "description": "Footsteps with no one there. Reported separately by three different people in one week, which is what makes this one hard to dismiss. Two of them were alone at the time and did not know about the others. This entry is deliberately long, because a seed row of four words hides every text-wrapping bug you have.", "spookiness": 5, "reported_at": "2026-08-05T22:40:00.000Z" },
-  { "id": "seed-4", "place": "Canteen", "description": "A cold spot near the back door, every morning before seven.", "spookiness": 1, "reported_at": "2026-08-06T07:15:00.000Z" },
-  { "id": "seed-5", "place": "AB Building stairwell", "description": "", "spookiness": 2, "reported_at": "2026-08-08T18:30:00.000Z" },
-  { "id": "seed-6", "place": "Chapel garden", "description": "Someone humming. Stops the moment you turn around.", "spookiness": 3, "reported_at": "2026-08-10T05:50:00.000Z" }
+  {
+    "id": 1,
+    "title": "ulolTris",
+    "problem": "Arcade Players that casually or competitively want to practice Tetris and block-stacking with adjustable controls.",
+    "summary": "A Tetr.io-inspired stacker with different game modes and different aesthetics. Comes with tunable configurations similar to Competitive Tetris to tweak your preferred DAS, ARR, soft drop speed, etc.",
+    "tech": ["JavaScript","HTML Canvas","Web Audio API", "esbuild"],
+    "image_url": "",
+    "live_url": "",
+    "repo_url": "https://github.com/JCDC0/ulolTris"
+  },
+  {
+    "id": 2,
+    "title": "Neon-Roguelike",
+    "problem": "A quick game that runs on a phone or browser with pleasing or chaotic elements of a topdown roguelite game featuring shapes and chaos.",
+    "summary": "A top down 2D roguelike shooter on a neon platform where a player shoots down different types of enemies of different shapes, sizes, abilities, and speed. Made with Google AI Studio.",
+    "tech": ["React","TypeScript","Vite","HTML Canvas"],
+    "image_url": "",
+    "live_url": "",
+    "repo_url": "https://github.com/JCDC0/Neon-Roguelike"
+  },
+  {
+    "id": 3,
+    "title": "HandsFree",
+    "problem": "People with motor disabilities who need to use their phone without touch input.",
+    "summary": "My Capstone Thesis. A mobile application that allows you to control your phone with your voice, all without privacy issues and supports English, Tagalog, and Taglish using a fine-tuned Whisper-tiny model running on a mobile device. No Internet Connection or an LLM is needed. ",
+    "tech": ["Android Accessibility Services", "Whisper (ONNX)", "Kotlin", "Speech Recognition"],
+    "image_url": "",
+    "live_url": "",
+    "repo_url": ""
+  },
+  {
+    "id": 4,
+    "title": "AIRPv2",
+    "problem": "Roleplay apps or chatapps commonly handle one to one conversations, presenting multiple characters under one LLM provider fully puts the burden that the LLM will remember what each character does",
+    "summary": "A Flutter app that allows multiple AI characters sharing one group chat system. Turn engines are implemented to simulate who messages first or what character appears or not, and this can be automated or done by the user. Supports multiple popular providers and themes, with v1 or v2 Character Cards. The app also utilizes BYOK, stream replies, import character cards seamlessly, and much more.",
+    "tech": ["Flutter","Dart","LLM APIs(OpenAI, OpenRouter, ETC)"],
+    "image_url": "",
+    "live_url": "",
+    "repo_url": "https://github.com/JCDC0/AIRPv2"
+  },
+  {
+    "id": 5,
+    "title": "Catnip Cafe",
+    "problem": "A cat cafe may require the need to integrate a system to seamlessly order online and allow customers to be welcomed, showcasing their cats, and how to contact or find the cafe itself.",
+    "summary": "A WEBCS project of a responsive website designed from Figma. Built with HTML, CSS, and includes a Mobile Hamburger Menu and a restaurant menu. Includes a display for cat images, the menu, contact information, and the home screen.",
+    "tech": ["HTML","CSS","JavaScript","Figma"],
+    "image_url": "",
+    "live_url": "https://jcdc0.github.io/Catnip-Cafe/",
+    "repo_url": "https://github.com/JCDC0/Catnip-Cafe"
+  }
 ]
