@@ -1,11 +1,13 @@
 # Personal Portfolio: Sci-Fi Terminal
 
+[![Made with AI](https://img.shields.io/badge/Made_with-AI_assistance-blue)](AI-USAGE.md)
+
 A personal portfolio for a computer science student, styled after the surveillance-machine interfaces in *Person of Interest*. It is built for recruiters: it shows each project as a problem, the solution that was built, and the tools used, with links to the live app and the source.
 
-**Live site:** https://jcdc0.github.io/Personal-Portfolio-SciFiTerminal/
-**API:** not deployed yet (week 2 to 3)
+**Live site (demo mode):** https://jcdc0.github.io/Personal-Portfolio-SciFiTerminal/
+**Full app with API and database:** runs locally for now (see [How to run it](#how-to-run-it)); deployed in week 3
 
-> **This deployment is running in demo mode.** The interface is real, but the backend is simulated in your browser, so the site works without a server. See [Demo mode](#demo-mode).
+> **The GitHub Pages site runs in demo mode.** Its backend is simulated in your browser, so it works without a server. Run the app locally, as below, to use the real Express API and PostgreSQL database. See [Demo mode](#demo-mode).
 
 ![The projects panel](docs/assets/projects.png)
 
@@ -14,10 +16,10 @@ A personal portfolio for a computer science student, styled after the surveillan
 | Route | What it shows |
 | --- | --- |
 | `/` | Home panel: the handle, a one-line pitch, and buttons to the projects and the contact form |
-| `/projects` | Every project as a card with its summary and tech tags. It shows a loading line, then the cards, or an error with a *Try again* button |
+| `/projects` | Every project as a card with its summary and tech tags, loaded from the API. It shows a loading line, then the cards, or an error with a *Try again* button |
 | `/projects/:id` | One project: the problem, what was built, tech tags, and links to the live site and source code. An unknown id shows "Project not found" |
-| `/about` | Placeholder for the bio, skills and resume download |
-| `/contact` | A contact form (name, email, message). On *Send* it shows "MESSAGE RECEIVED" or the error |
+| `/about` | Placeholder for the bio and skills |
+| `/contact` | A contact form (name, email, message) that saves to the database. On *Send* it shows "MESSAGE RECEIVED" or the server's error |
 | anything else | A 404 panel with a link back home |
 
 The header and footer navigation reach every panel, so no page is a dead end.
@@ -26,63 +28,113 @@ The header and footer navigation reach every panel, so no page is a dead end.
 
 ### API
 
-The client calls these through `client/src/api/`. In demo mode they are answered in the browser. The Express versions are the week 2 work.
+An Express server in `server/`, backed by PostgreSQL. Every query uses parameters (`$1`, `$2`, …), never string concatenation.
 
-| Method | Path | What it does |
-| --- | --- | --- |
-| GET | `/api/projects` | List all projects |
-| GET | `/api/projects/:id` | One project, or 404 |
-| POST | `/api/messages` | Save a contact message (`name`, `email` and `message` are required, otherwise 400) |
+| Method | Path | Success | Errors |
+| --- | --- | --- | --- |
+| GET | `/api/projects` | 200 with an array of projects, in id order | 500 `{ "error": "Something went wrong on the server" }` |
+| GET | `/api/projects/:id` | 200 with one project | 404 `{ "error": "Not found" }` for an unknown or non-numeric id |
+| POST | `/api/messages` | 201 with the saved message (`id`, `name`, `email`, `message`, `created_at`) | 400 if `name`, `email` or `message` is missing or blank, longer than 120 / 254 / 2000 characters, or the body is not valid JSON |
+| GET | `/healthz` | 200 `{ "ok": true }`: the process is running | |
+| GET | `/readyz` | 200 `{ "ok": true, "db": "up" }`: the database answers | 503 `{ "ok": false, "db": "down" }` |
+
+A project looks like this:
+
+```json
+{
+  "id": 1,
+  "title": "ulolTris",
+  "problem": "Arcade players that ... want to practice Tetris ...",
+  "summary": "A Tetr.io-inspired stacker ...",
+  "tech": ["JavaScript", "HTML Canvas", "Web Audio API", "esbuild"],
+  "image_url": "",
+  "live_url": "",
+  "repo_url": "https://github.com/JCDC0/ulolTris"
+}
+```
+
+Sending a message from PowerShell:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/messages -ContentType "application/json" -Body '{"name":"Ada","email":"ada@example.com","message":"Hello"}'
+```
 
 ## Setup and installation
 
-You need **Node.js 20 or newer** (npm comes with it) and **Git**.
+You need **Node.js 20 or newer** (npm comes with it), **Git**, and a **PostgreSQL database**. The project uses a free [Neon](https://neon.com) database, but any PostgreSQL 14+ works, including a local one.
 
 1. Get the code:
 
     ```bash
     git clone https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal.git
-    cd Personal-Portfolio-SciFiTerminal/client
+    cd Personal-Portfolio-SciFiTerminal
     ```
 
-2. Install the dependencies:
+2. Create a database. On Neon, sign up, create a project, and copy its connection string from **Connect**.
+
+3. Set up the server. Use `copy` on Windows and `cp` on macOS or Linux:
 
     ```bash
+    cd server
     npm install
-    ```
-
-3. Create your environment file from the example. Use `copy` on Windows and `cp` on macOS or Linux:
-
-    ```bash
     copy .env.example .env
     ```
 
-No database is needed yet. The client runs in demo mode until the API exists.
+    Open `server/.env` and set `DATABASE_URL` to your connection string. Never commit this file.
+
+4. Create the tables and load the sample projects:
+
+    ```bash
+    npm run db:reset
+    ```
+
+    This runs `db/schema.sql`, then `db/seed.sql`. The seed starts with `TRUNCATE`, so it empties the `projects` table first.
+
+5. Set up the client:
+
+    ```bash
+    cd ../client
+    npm install
+    copy .env.example .env
+    ```
+
+    Open `client/.env` and set `VITE_USE_MOCK_API=false` and `VITE_API_BASE_URL=http://localhost:3000`. Leave them as they are to stay in demo mode, which needs no server.
 
 ### Environment variables
 
-None of these are committed. `.env.example` lists them with placeholder values.
+None of these are committed. Each folder's `.env.example` lists them with placeholder values.
 
 | Name | Where | Example | What it is |
 | --- | --- | --- | --- |
-| `VITE_USE_MOCK_API` | client, at build time | `true` | Only the exact value `false` turns demo mode off |
-| `VITE_API_BASE_URL` | client, at build time | `http://localhost:3000` | The API's address, no trailing slash. Ignored in demo mode |
-| `DATABASE_URL` | server (week 2) | `postgresql://postgres:devpassword@localhost:5432/portfolio` | PostgreSQL connection string |
-| `CORS_ORIGINS` | server (week 2) | `http://localhost:5173` | Origins allowed to call the API |
+| `DATABASE_URL` | server | `postgresql://user:password@host.neon.tech/neondb?sslmode=require` | PostgreSQL connection string. Contains a password |
+| `CORS_ORIGINS` | server | `http://localhost:5173` | Comma-separated origins allowed to call the API |
+| `NODE_ENV` | server | `development` | `production` on a host |
+| `VITE_USE_MOCK_API` | client, at build time | `false` | Only the exact value `false` turns demo mode off |
+| `VITE_API_BASE_URL` | client, at build time | `http://localhost:3000` | The API's address, no trailing slash |
 
 Every `VITE_` value is compiled into the public JavaScript, so none of them may hold a password or key.
 
 ## How to run it
 
-From the `client` folder:
+Two terminals.
+
+**Terminal 1, the API** (from `server/`):
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:5173. You should see the Home panel with a yellow **Demo mode** notice under the header. Click **Projects** and five project cards appear after a short loading line.
+It prints `API listening on http://localhost:3000`. Open http://localhost:3000/readyz and expect `{"ok":true,"db":"up"}`.
 
-To build the production version, which is what GitHub Pages serves:
+**Terminal 2, the site** (from `client/`):
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173. There is no yellow demo notice, and **Projects** shows the five projects from the database after a short loading line.
+
+To build the production version of the client:
 
 ```bash
 npm run build
@@ -94,22 +146,28 @@ npm run build
 
 | Value | What happens |
 | --- | --- |
-| unset, or `true` | Projects come from `client/src/api/seed.json`, and contact messages are saved to the visitor's own `localStorage`. There is no server and no database. |
-| `false` | The client calls the Express API at `VITE_API_BASE_URL`, which will read and write PostgreSQL. |
+| unset, or `true` | Projects come from `client/src/api/seed.json`, and contact messages are saved to the visitor's own `localStorage`. There is no server and no database. The GitHub Pages site uses this. |
+| `false` | The client calls the Express API at `VITE_API_BASE_URL`, which reads and writes PostgreSQL. |
 
-Both implementations (`mockApi.js` and `httpApi.js`) export the same three functions, `listProjects`, `getProject` and `sendMessage`. That makes switching to the real API a one-variable change.
+Both implementations (`mockApi.js` and `httpApi.js`) export the same three functions, `listProjects`, `getProject` and `sendMessage`. That is why switching to the real API needed no changes to the pages.
 
 ## Project structure
 
 ```
 client/                 React 18 + Vite front end
-  src/api/              index.js picks mockApi.js or httpApi.js; seed.json holds the project data
+  src/api/              index.js picks mockApi.js or httpApi.js; seed.json is the demo data
   src/components/       Header, Footer, ProjectCard, DemoNotice
   src/pages/            one panel per route: Home, Projects, ProjectDetail, About, Contact, NotFound
   src/styles.css        the Machine (dark) and Samaritan (light) colour tokens
-server/                 Express + PostgreSQL API (still the class template; replaced in week 2)
+server/                 Express API
+  server.js             routes, input validation and error handling
+  projectsRepo.js       SQL for projects (read only)
+  messagesRepo.js       SQL for contact messages (insert)
+  db/schema.sql         the projects and messages tables, with length limits enforced by the database
+  db/seed.sql           the five projects
+  db/pool.js, db/run.js the connection pool, and the runner behind npm run db:reset
 docs/assets/            screenshots
-.github/workflows/      builds the client and deploys it to GitHub Pages on every push
+.github/workflows/      builds the client and deploys the demo to GitHub Pages
 ```
 
 ## Screenshots
@@ -120,17 +178,15 @@ docs/assets/            screenshots
 
 ## Known issues and next steps
 
-- **The API and database don't exist yet.** `server/` is still the template's sightings API. Next: a `projects` and `messages` schema, `GET /api/projects`, `GET /api/projects/:id` and `POST /api/messages` with parameterised SQL, and then deployment.
-- **The About panel is a placeholder**, and there is no resume download yet.
-- **The *Person of Interest* look is only started.** The colour tokens are in, but the 3D "void" with camera travel between panels, the theme and sound toggles, and the Futura PT and Magda Clean Mono fonts are not built yet.
+- **The API and database are not deployed yet.** In week 3, one Render service will serve both the site and the API from a custom domain behind Cloudflare Zero Trust, because the contact form writes to the database.
+- **The database accepts connections from any address.** Neon's free plan has no IP allow-list. It is protected by the password and TLS, and the app will get its own database user that can only read projects and add messages.
+- **The About panel is a placeholder.**
+- **The *Person of Interest* look is only started.** The colour tokens are in, but the CCTV-style camera travel between panels, the theme and sound toggles, and the Futura PT and Magda Clean Mono fonts are not built yet.
 - **Project cards have no images yet** (`image_url` is empty for every project).
-- Before the API goes public, the contact endpoint needs an access gate, because it writes to the database.
 
 ## AI use
 
-![Built with AI assistance](https://img.shields.io/badge/built%20with-AI%20assistance-0b5fff)
-
-Built with help from Claude (Anthropic). It was used for the React routing and page scaffolding and for drafting documentation. The project data and design decisions are my own, and the backend routes and SQL will be too. The full record, with commit links, is in [AI-USAGE.md](AI-USAGE.md).
+Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The parts I wrote are the project content (`client/src/api/seed.json`), the seed data (`server/db/seed.sql`) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
 
 ## Author
 

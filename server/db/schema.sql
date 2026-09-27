@@ -1,20 +1,18 @@
--- The complete shape of the database. Safe to run against an empty database,
--- and safe to run twice.
---
--- This file is committed on purpose. Your schema is a fact about your
--- application, not a runtime concern: it should be readable by opening a file
--- rather than by connecting to a server. It is also what lets you move to a
--- hosted database in one command.
-
-CREATE TABLE IF NOT EXISTS sightings (
-  id          SERIAL PRIMARY KEY,
-  place       TEXT        NOT NULL,
-  description TEXT        NOT NULL DEFAULT '',
-  spookiness  INTEGER     NOT NULL CHECK (spookiness BETWEEN 1 AND 5),
-  reported_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS projects (
+  id        SERIAL PRIMARY KEY,
+  title     TEXT   NOT NULL CHECK (char_length(title) BETWEEN 1 AND 120),
+  problem   TEXT   NOT NULL DEFAULT '',
+  summary   TEXT   NOT NULL DEFAULT '',
+  tech      TEXT[] NOT NULL DEFAULT '{}',
+  image_url TEXT   NOT NULL DEFAULT '',
+  live_url  TEXT   NOT NULL DEFAULT '',
+  repo_url  TEXT   NOT NULL DEFAULT ''
 );
 
--- The list page always sorts newest first. Without this the database reads
--- every row and sorts it on each request.
-CREATE INDEX IF NOT EXISTS sightings_reported_at_idx
-  ON sightings (reported_at DESC);
+CREATE TABLE IF NOT EXISTS messages (
+  id         SERIAL      PRIMARY KEY,
+  name       TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 120),
+  email      TEXT        NOT NULL CHECK (char_length(email) BETWEEN 3 AND 254),
+  message    TEXT        NOT NULL CHECK (char_length(message) BETWEEN 1 AND 2000),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
