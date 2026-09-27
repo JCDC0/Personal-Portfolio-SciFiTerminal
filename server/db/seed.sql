@@ -1,27 +1,28 @@
--- Sample data for development.
---
--- This starts with TRUNCATE. That is correct on your laptop and catastrophic
--- against the database your live demo depends on. Check which DATABASE_URL is
--- loaded before you run it.
+TRUNCATE TABLE projects RESTART IDENTITY CASCADE;
 
-TRUNCATE TABLE sightings RESTART IDENTITY CASCADE;
-
-INSERT INTO sightings (place, description, spookiness, reported_at) VALUES
-  ('Library, third floor',
-   'Chairs rearranged overnight, every time. The night guard says he locks the room himself.',
-   3, now() - interval '12 days'),
-  ('Old gym',
-   'Lights flicker in a fixed pattern after 9pm, always three short and one long.',
-   4, now() - interval '10 days'),
-  ('Parking basement',
-   'Footsteps with no one there. Reported separately by three different people in one week, which is what makes this one hard to dismiss. Two of them were alone at the time and did not know about the others. This row is deliberately long, because a seed of four words hides every text-wrapping bug you have.',
-   5, now() - interval '8 days'),
-  ('Canteen',
-   'A cold spot near the back door, every morning before seven.',
-   1, now() - interval '7 days'),
-  ('AB Building stairwell',
-   '',
-   2, now() - interval '5 days'),
-  ('Chapel garden',
-   'Someone humming. Stops the moment you turn around.',
-   3, now() - interval '2 days');
+INSERT INTO projects (title, problem, summary, tech, image_url, live_url, repo_url) VALUES
+  ('ulolTris',
+   'Arcade Players that casually or competitively want to practice Tetris and block-stacking with adjustable controls.',
+   'A Tetr.io-inspired stacker with different game modes and different aesthetics. Comes with tunable configurations similar to Competitive Tetris to tweak your preferred DAS, ARR, soft drop speed, etc.',
+   ARRAY['JavaScript', 'HTML Canvas', 'Web Audio API', 'esbuild'],
+   '', '', 'https://github.com/JCDC0/ulolTris'),
+  ('Neon-Roguelike',
+   'A quick game that runs on a phone or browser with pleasing or chaotic elements of a topdown roguelite game featuring shapes and chaos.',
+   'A top down 2D roguelike shooter on a neon platform where a player shoots down different types of enemies of different shapes, sizes, abilities, and speed. Made with Google AI Studio.',
+   ARRAY ['React','TypeScript','Vite','HTML Canvas'],
+   '', '', 'https://github.com/JCDC0/Neon-Roguelike'),
+  ('HandsFree',
+   'People with motor disabilities who need to use their phone without touch input.',
+   'My Capstone Thesis. A mobile application that allows you to control your phone with your voice, all without privacy issues and supports English, Tagalog, and Taglish using a fine-tuned Whisper-tiny model running on a mobile device. No Internet Connection or an LLM is needed.',
+   ARRAY['Android Accessibility Services', 'Whisper (ONNX)', 'Kotlin', 'Speech Recognition'],
+   '', '', ''),
+  ('AIRPv2',
+   'Roleplay apps or chatapps commonly handle one to one conversations, presenting multiple characters under one LLM provider fully puts the burden that the LLM will remember what each character does',
+   'A Flutter app that allows multiple AI characters sharing one group chat system. Turn engines are implemented to simulate who messages first or what character appears or not, and this can be automated or done by the user. Supports multiple popular providers and themes, with v1 or v2 Character Cards. The app also utilizes BYOK, stream replies, import character cards seamlessly, and much more.',
+   ARRAY['Flutter','Dart','LLM APIs(OpenAI, OpenRouter, ETC)'],
+   '', '', 'https://github.com/JCDC0/AIRPv2'),
+  ('Catnip Cafe',
+   'A cat cafe may require the need to integrate a system to seamlessly order online and allow customers to be welcomed, showcasing their cats, and how to contact or find the cafe itself.',
+   'A WEBCS project of a responsive website designed from Figma. Built with HTML, CSS, and includes a Mobile Hamburger Menu and a restaurant menu. Includes a display for cat images, the menu, contact information, and the home screen.',
+   ARRAY['HTML','CSS','JavaScript','Figma'],
+   '', 'https://jcdc0.github.io/Catnip-Cafe/', 'https://github.com/JCDC0/Catnip-Cafe');
