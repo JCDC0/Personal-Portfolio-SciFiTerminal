@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
+import { imageUrl } from '../imageUrl.js'
 
 export default function ProjectCard({ project }) {
   return (
     <li className="card project-card">
+      {project.image_url && (
+        <img className="card-image" src={imageUrl(project.image_url)} alt="" loading="lazy" />
+      )}
       <Link to={`/projects/${project.id}`}>
         <h3>{project.title}</h3>
       </Link>

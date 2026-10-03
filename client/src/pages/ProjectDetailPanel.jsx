@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getProject } from '../api'
+import { imageUrl } from '../imageUrl.js'
 
 export default function ProjectDetailPanel() {
   const { id } = useParams()
@@ -43,9 +44,15 @@ export default function ProjectDetailPanel() {
       {status === 'error' && <p className="error" role="alert">{error.message}</p>}
 
       {status === 'ready' && (
-        <article>
-          <p className="mono muted">PROJECT // {String(project.id).padStart(3, '0')}</p>
+        <article className="feed-in">
+          <p className="mono muted">PROJECT // {String(project.id).padStart(3, '0')} // SIGNAL ACQUIRED</p>
           <h1>{project.title}</h1>
+
+          {project.image_url && (
+            <figure className="shot">
+              <img src={imageUrl(project.image_url)} alt={`Screenshot of ${project.title}`} />
+            </figure>
+          )}
 
           <h2>Problem</h2>
           {project.problem ? <p>{project.problem}</p> : <p className="muted">Not written yet.</p>}

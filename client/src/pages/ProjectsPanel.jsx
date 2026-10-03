@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { listProjects } from '../api'
 import ProjectCard from '../components/ProjectCard.jsx'
+import SurveillanceWall from '../components/SurveillanceWall.jsx'
+import { useMediaQuery } from '../hooks.js'
 
 export default function ProjectsPanel() {
+  const wide = useMediaQuery('(min-width: 769px)')
   const [status, setStatus] = useState('loading')
   const [projects, setProjects] = useState([])
   const [error, setError] = useState(null)
@@ -49,7 +52,9 @@ export default function ProjectsPanel() {
         <p className="muted">No projects to show yet.</p>
       )}
 
-      {status === 'ready' && projects.length > 0 && (
+      {status === 'ready' && projects.length > 0 && wide && <SurveillanceWall projects={projects} />}
+
+      {status === 'ready' && projects.length > 0 && !wide && (
         <ul className="list project-grid">
           {projects.map((project) => <ProjectCard key={project.id} project={project} />)}
         </ul>
