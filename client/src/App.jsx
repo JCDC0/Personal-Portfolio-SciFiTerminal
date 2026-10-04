@@ -13,8 +13,8 @@ export default function App() {
   return (
     <div className="page">
       <Header />
-      <DemoNotice />
       <main>
+        <DemoNotice />
         <Routes>
           <Route path="/" element={<HomePanel />} />
           <Route path="/projects" element={<ProjectsPanel />} />

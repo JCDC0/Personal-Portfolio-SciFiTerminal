@@ -31,6 +31,15 @@ export default function ProjectsPanel() {
     load()
   }, [])
 
+  if (status === 'ready' && projects.length > 0 && wide) {
+    return (
+      <section className="stage" aria-labelledby="projects-title">
+        <h1 id="projects-title" className="sr-only">Projects</h1>
+        <SurveillanceWall projects={projects} />
+      </section>
+    )
+  }
+
   return (
     <section className="panel">
       <p className="mono muted">PROJECTS // {status === 'ready' ? `${projects.length} FOUND` : status.toUpperCase()}</p>
@@ -52,9 +61,7 @@ export default function ProjectsPanel() {
         <p className="muted">No projects to show yet.</p>
       )}
 
-      {status === 'ready' && projects.length > 0 && wide && <SurveillanceWall projects={projects} />}
-
-      {status === 'ready' && projects.length > 0 && !wide && (
+      {status === 'ready' && projects.length > 0 && (
         <ul className="list project-grid">
           {projects.map((project) => <ProjectCard key={project.id} project={project} />)}
         </ul>

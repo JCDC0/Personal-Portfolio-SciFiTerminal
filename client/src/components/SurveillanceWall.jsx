@@ -91,7 +91,7 @@ function cameraFor(slot, size, mode) {
   }
   const scale = mode === 'opening'
     ? Math.max(size.width / FEED_W, size.height / FEED_H) * 1.15
-    : Math.min((size.width * 0.44) / FEED_W, (size.height * 0.5) / FEED_H)
+    : Math.min((size.width * 0.38) / FEED_W, (size.height * 0.46) / FEED_H)
   return {
     x: slot.x,
     y: slot.y,
