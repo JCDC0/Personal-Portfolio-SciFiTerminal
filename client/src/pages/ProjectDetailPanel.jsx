@@ -30,7 +30,7 @@ export default function ProjectDetailPanel() {
 
   return (
     <section className="panel">
-      <Link to="/projects" className="back">&larr; Back to projects</Link>
+      <Link to="/projects" className="back">&lsaquo; Back to projects</Link>
 
       {status === 'loading' && <p className="muted">Loading...</p>}
 

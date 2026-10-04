@@ -11,7 +11,7 @@ export default function SoundToggle() {
       aria-label={`Sound effects ${on ? 'on' : 'off'}`}
       onClick={() => setSound(!on)}
     >
-      <span aria-hidden="true">&#9834; </span>{on ? 'ON' : 'OFF'}
+      Sound: {on ? 'on' : 'off'}
     </button>
   )
 }

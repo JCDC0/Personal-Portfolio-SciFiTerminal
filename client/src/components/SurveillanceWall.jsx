@@ -348,10 +348,10 @@ export default function SurveillanceWall({ projects }) {
 
       <div className="wall-controls">
         <button type="button" className="secondary" onClick={() => { setScanning(false); step(-1) }}>
-          &larr; Prev feed
+          &lsaquo; Prev feed
         </button>
         <button type="button" className="secondary" onClick={() => { setScanning(false); step(1) }}>
-          Next feed &rarr;
+          Next feed &rsaquo;
         </button>
         <button
           type="button"
