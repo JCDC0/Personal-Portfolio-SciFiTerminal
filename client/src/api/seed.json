@@ -5,7 +5,7 @@
     "problem": "Arcade Players that casually or competitively want to practice Tetris and block-stacking with adjustable controls.",
     "summary": "A Tetr.io-inspired stacker with different game modes and different aesthetics. Comes with tunable configurations similar to Competitive Tetris to tweak your preferred DAS, ARR, soft drop speed, etc.",
     "tech": ["JavaScript","HTML Canvas","Web Audio API", "esbuild"],
-    "image_url": "",
+    "image_url": "shots/uloltrisgame.jpg",
     "live_url": "",
     "repo_url": "https://github.com/JCDC0/ulolTris"
   },
@@ -15,7 +15,7 @@
     "problem": "A quick game that runs on a phone or browser with pleasing or chaotic elements of a topdown roguelite game featuring shapes and chaos.",
     "summary": "A top down 2D roguelike shooter on a neon platform where a player shoots down different types of enemies of different shapes, sizes, abilities, and speed. Made with Google AI Studio.",
     "tech": ["React","TypeScript","Vite","HTML Canvas"],
-    "image_url": "",
+    "image_url": "shots/neon-roguelike2.jpg",
     "live_url": "",
     "repo_url": "https://github.com/JCDC0/Neon-Roguelike"
   },
@@ -25,19 +25,19 @@
     "problem": "People with motor disabilities who need to use their phone without touch input.",
     "summary": "My Capstone Thesis. A mobile application that allows you to control your phone with your voice, all without privacy issues and supports English, Tagalog, and Taglish using a fine-tuned Whisper-tiny model running on a mobile device. No Internet Connection or an LLM is needed. ",
     "tech": ["Android Accessibility Services", "Whisper (ONNX)", "Kotlin", "Speech Recognition"],
-    "image_url": "",
+    "image_url": "shots/handsfree2.jpg",
     "live_url": "",
     "repo_url": ""
   },
   {
     "id": 4,
-    "title": "AIRPv2",
-    "problem": "Roleplay apps or chatapps commonly handle one to one conversations, presenting multiple characters under one LLM provider fully puts the burden that the LLM will remember what each character does",
-    "summary": "A Flutter app that allows multiple AI characters sharing one group chat system. Turn engines are implemented to simulate who messages first or what character appears or not, and this can be automated or done by the user. Supports multiple popular providers and themes, with v1 or v2 Character Cards. The app also utilizes BYOK, stream replies, import character cards seamlessly, and much more.",
+    "title": "AIRP",
+    "problem": "Roleplay apps or chatapps commonly restrict the user heavily with subscriptions, context that is lost due to limits, presenting a poor quality service with almost little control for users.",
+    "summary": "A Flutter app that allows the user full control of their conversations and decorate their messaging style with a variety of settings and full control of their chat context and LLM responses. Utilizes v1 or v2 Character Cards, BYOK, streaming replies, full background and text design controls, import and export text, settings, presets, and so much more.",
     "tech": ["Flutter","Dart","LLM APIs(OpenAI, OpenRouter, ETC)"],
-    "image_url": "",
+    "image_url": "shots/airp-text.jpg",
     "live_url": "",
-    "repo_url": "https://github.com/JCDC0/AIRPv2"
+    "repo_url": "https://github.com/JCDC0/AIRP"
   },
   {
     "id": 5,
@@ -45,8 +45,18 @@
     "problem": "A cat cafe may require the need to integrate a system to seamlessly order online and allow customers to be welcomed, showcasing their cats, and how to contact or find the cafe itself.",
     "summary": "A WEBCS project of a responsive website designed from Figma. Built with HTML, CSS, and includes a Mobile Hamburger Menu and a restaurant menu. Includes a display for cat images, the menu, contact information, and the home screen.",
     "tech": ["HTML","CSS","JavaScript","Figma"],
-    "image_url": "",
+    "image_url": "shots/catnipcafe1.jpg",
     "live_url": "https://jcdc0.github.io/Catnip-Cafe/",
     "repo_url": "https://github.com/JCDC0/Catnip-Cafe"
+  },
+    {
+    "id": 6,
+    "title": "LowBeam",
+    "problem": "The need to play a racing arcade game without the need of having expensive hardware and the need to download a game or install it on your computer.",
+    "summary": "A racing ps1 arcade webgame built with Three.js and Javascript. The game features an open world with highways, cities, and low poly environments. It includes five low poly vehicles that can be driven, refuelled, repair, and face off heavy traffic, rivals and police.",
+    "tech": ["Three.js","JavaScript","Web Audio API"],
+    "image_url": "shots/lowbeam1.jpg",
+    "live_url": "",
+    "repo_url": "https://github.com/JCDC0/Lowbeam"
   }
 ]
