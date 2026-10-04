@@ -5,7 +5,7 @@ This project was built with a lot of AI assistance, and this file is the honest 
 **How I worked.** I cannot write JavaScript or SQL syntax from memory yet, so from week 2 onward the AI wrote most of the code. My part was:
 
 - **Directing:** I chose the features, the rules and limits, the database, the hosting and the design.
-- **Writing the content and data:** every project description, the seed rows, and the three SQL queries.
+- **Writing the content and data:** every project description, the seed rows after the first example row, and the three SQL queries.
 - **Testing:** I ran every step myself and checked the result in the terminal and the browser.
 
 The AI never committed anything: every commit in this repository was reviewed and made by me.
@@ -104,6 +104,40 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I kept, what I changed, and why:** Before committing, I opened each commit link to check that the entry matches what really happened, and changed the parts I remember differently. Section 3 is the one I care most about getting right, because it has to be my own explanation of my own code.
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commits/main/AI-USAGE.md
 
+### 2026-10-03 - The Person of Interest camera wall
+
+- **Tool:** Claude Code
+- **What I asked for:** A recreation of the scene in *Person of Interest* where the Machine moves from one CCTV feed to another, but with my project cards as the feeds. From the options it listed, I chose a wall on the Projects page, and a camera that scans from feed to feed on its own and stops when I click.
+- **What it gave back:**
+    - `SurveillanceWall.jsx`: a large plane built with CSS 3D transforms (no 3D library), with my projects as feeds among small decorative camera tiles. The camera moves by shifting the plane over 600 ms.
+    - An overlay with the camera ID, a REC clock, a lock-on box and a SUBJECT / STATUS label.
+    - Click once to lock on, click again to zoom in and open the project. Arrow keys work too, phones get a plain list, and reduced-motion settings get instant cuts.
+- **What I kept, what I changed, and why:** I kept the design, because it matches the scene and my concept images. I ran it and clicked through it myself, and that is how I found it sat in a small window instead of filling the screen (section 2, case 5).
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a66f19
+
+### 2026-10-04 - Full-screen layout and free fonts
+
+- **Tool:** Claude Code
+- **What I asked for:** After running the wall, I told it the site should cover the whole screen with a small header and footer peeking out, like my wireframe. I also gave it the Futura PT and Magda Clean Mono fonts I had downloaded, and asked it to use them if they were free.
+- **What it gave back:**
+    - A fixed slim header and footer, a dark full-screen background, and the wall filling the screen behind them.
+    - It read the licence inside the font files: Futura PT is under ParaType's "all rights reserved" licence, and Magda Clean Mono is a commercial FontFont. Neither is free to put in a public repository.
+- **What I kept, what I changed, and why:** I chose Jost and Space Mono instead, which are both free under the SIL Open Font License. They are installed as npm packages, so the site does not depend on Google's servers. I took the project screenshots myself and picked one for each project; the AI only shrank them to web size.
+- **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/8540048 (layout and fonts) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/0faae15 (my project data and screenshots)
+
+### 2026-10-04 - Camera sounds, the About page and fixing the frozen wall
+
+- **Tool:** Claude Code
+- **What I asked for:** Sound when the camera moves between cards, which my wireframe's Sounds ON/OFF toggle was for, and an About page with my resume. When I ran both servers, the cards did not move at all.
+- **What it gave back:**
+    - `sound.js`: sounds generated in code with the Web Audio API (a whoosh when the camera moves, two beeps when it locks on, a sweep when a project opens), and a header toggle that is off by default.
+    - An About page with my bio, skills and a Resume button.
+    - A fix for the frozen wall (section 2, case 6).
+- **What I kept, what I changed, and why:**
+    - My resume has my full name, photo, phone number, personal email and home address, which must not be in a public repository. I chose to keep it on Google Drive and link to it, so only the link is in the code.
+    - The About bio is taken from the "About Me" text on my own resume.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/REPLACE-WITH-COMMIT-SHA
+
 ## 2. Where the AI got it wrong
 
 ### Case 1 - It planned before reading the template
@@ -134,6 +168,20 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I did instead:** The credit was rewritten to say plainly that Claude Code wrote most of the code, and to name only the parts I wrote.
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fd63dda
 
+### Case 5 - The first wall sat in a small window
+
+- **What it gave me:** A camera wall inside a box in the middle of an ordinary web page, with the header and footer taking up their own rows.
+- **What was wrong with it:** My wireframes show the site filling the whole screen, with a thin header and footer peeking out. In a box, the wall looked like a normal website with a gimmick, not like the Machine's screens.
+- **What I did instead:** I told it the site is supposed to cover the entire screen. It rebuilt the layout so every page sits on a full-screen dark background, and the wall fills the screen behind a slim header and footer.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/8540048
+
+### Case 6 - The AI froze its own camera wall
+
+- **What it gave me:** An auto-scan that paused whenever the mouse was over the wall, so you could stop to read a card.
+- **What was wrong with it:** After the wall went full-screen, the mouse was always over it. When I ran both servers the cards sat frozen. The AI's own tests had passed, because its test browser never had a mouse on the page. Its first fix (pause only over a card) still froze the wall whenever my mouse rested in the middle of the screen, where the focused card is, and it found that on its second test.
+- **What I did instead:** I reported the frozen cards, and it removed pause-on-hover completely. The scan now stops only when I click a card, use the arrow keys, or press the Auto-scan button.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/REPLACE-WITH-COMMIT-SHA
+
 ## 3. Who wrote what
 
 Most of the code in this project was written by the AI. The parts below are mine. I typed them myself, using my own m5a3 activity as a reference, and fixed them after review.
@@ -143,9 +191,9 @@ Most of the code in this project was written by the AI. The parts below are mine
 - **File:** `server/db/seed.sql`
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/80d5fd6
 - **What it does and why it is built this way:**
-    - This file fills the `projects` table with my five projects when I run `npm run db:reset`.
+    - This file fills the `projects` table with my projects when I run `npm run db:reset`.
     - It starts with `TRUNCATE TABLE projects RESTART IDENTITY CASCADE`. That empties the table and resets the id counter, so running it twice does not make duplicates, and ulolTris is always id 1.
-    - Then one `INSERT INTO projects (...) VALUES` lists the columns once, followed by five rows separated by commas. My first try repeated the `INSERT` line for every row, which is not how a multi-row insert works.
+    - Then one `INSERT INTO projects (...) VALUES` lists the columns once, followed by one row per project, separated by commas. The AI wrote the first row as the pattern to copy, and I typed the other rows myself (later I swapped one project and added another). My first try repeated the `INSERT` line for every row, which is not how a multi-row insert works.
     - The tech list is a PostgreSQL text array, written `ARRAY['React', 'Vite']`. SQL uses single quotes for text, not the double quotes JSON uses, and that was my other mistake.
     - The text itself is my own: the problem each project solves and what I built.
 
