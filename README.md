@@ -18,7 +18,7 @@ A personal portfolio for a computer science student, styled after the surveillan
 | `/` | Home panel: the handle, a one-line pitch, and buttons to the projects and the contact form |
 | `/projects` | A full-screen surveillance wall. Each project is a camera feed with its screenshot, and the camera scans from feed to feed on its own. Click a feed to lock on, click again to open it; the arrow keys and the Prev / Next buttons move the camera by hand. On a phone, or with reduced motion on, it falls back to a plain list of cards. It shows a loading line first, or an error with a *Try again* button |
 | `/projects/:id` | One project: the problem, what was built, tech tags, and links to the live site and source code. An unknown id shows "Project not found" |
-| `/about` | Placeholder for the bio and skills |
+| `/about` | A short bio, skills, strengths and languages, with a link to my resume on Google Drive (the resume is not stored in this repository) |
 | `/contact` | A contact form (name, email, message) that saves to the database. On *Send* it shows "MESSAGE RECEIVED" or the server's error |
 | anything else | A 404 panel with a link back home |
 
@@ -158,6 +158,7 @@ client/                 React 18 + Vite front end
   src/api/              index.js picks mockApi.js or httpApi.js; seed.json is the demo data
   src/components/       Header, Footer, ProjectCard, SurveillanceWall, SoundToggle, DemoNotice
   src/sound.js          the camera sound effects, generated with the Web Audio API
+  src/links.js          the resume (Google Drive) and GitHub links
   src/pages/            one panel per route: Home, Projects, ProjectDetail, About, Contact, NotFound
   src/styles.css        the Machine (dark) and Samaritan (light) colour tokens
 server/                 Express API
@@ -181,7 +182,6 @@ docs/assets/            screenshots
 
 - **The API and database are not deployed yet.** In week 3, one Render service will serve both the site and the API from a custom domain behind Cloudflare Zero Trust, because the contact form writes to the database.
 - **The database accepts connections from any address.** Neon's free plan has no IP allow-list. It is protected by the password and TLS, and the app will get its own database user that can only read projects and add messages.
-- **The About panel is a placeholder.**
 - **The *Person of Interest* look is partly done.** The surveillance wall, the camera sounds (off by default; toggle in the header) and the dark Machine colours are in. The light Samaritan theme toggle is not built yet, and the other pages are still plain panels.
 - **Fonts:** Jost and Space Mono (both free under the SIL Open Font Licence). The Futura PT and Magda Clean Mono fonts in the original design are commercial, so they are not used.
 
