@@ -123,7 +123,8 @@ The AI never committed anything: every commit in this repository was reviewed an
     - A fixed slim header and footer, a dark full-screen background, and the wall filling the screen behind them.
     - It read the licence inside the font files: Futura PT is under ParaType's "all rights reserved" licence, and Magda Clean Mono is a commercial FontFont. Neither is free to put in a public repository.
 - **What I kept, what I changed, and why:** I chose Jost and Space Mono instead, which are both free under the SIL Open Font License. They are installed as npm packages, so the site does not depend on Google's servers. I took the project screenshots myself and picked one for each project; the AI only shrank them to web size.
-- **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/8540048 (layout and fonts) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/0faae15 (my project data and screenshots)
+    - Later I noticed some text was not in either font. It checked every piece of text and found that only three symbols (a music note and two arrows) were missing from both fonts, so the browser used my computer's default font for them. It replaced them with characters both fonts have.
+- **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/8540048 (layout and fonts), https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/0faae15 (my project data and screenshots) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/5d76bae (the symbol fix)
 
 ### 2026-10-04 - Camera sounds, the About page and fixing the frozen wall
 
@@ -136,7 +137,7 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I kept, what I changed, and why:**
     - My resume has my full name, photo, phone number, personal email and home address, which must not be in a public repository. I chose to keep it on Google Drive and link to it, so only the link is in the code.
     - The About bio is taken from the "About Me" text on my own resume.
-- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/REPLACE-WITH-COMMIT-SHA
+- **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/93814a0 (the sounds and the freeze fix) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fc68b85 (the About page and resume link)
 
 ## 2. Where the AI got it wrong
 
@@ -180,7 +181,7 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What it gave me:** An auto-scan that paused whenever the mouse was over the wall, so you could stop to read a card.
 - **What was wrong with it:** After the wall went full-screen, the mouse was always over it. When I ran both servers the cards sat frozen. The AI's own tests had passed, because its test browser never had a mouse on the page. Its first fix (pause only over a card) still froze the wall whenever my mouse rested in the middle of the screen, where the focused card is, and it found that on its second test.
 - **What I did instead:** I reported the frozen cards, and it removed pause-on-hover completely. The scan now stops only when I click a card, use the arrow keys, or press the Auto-scan button.
-- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/REPLACE-WITH-COMMIT-SHA
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/93814a0
 
 ## 3. Who wrote what
 
