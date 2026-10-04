@@ -305,6 +305,7 @@ input, textarea {
   width: 200%;
   height: 200%;
   transform: translateZ(-700px);
+  animation: far-drift 45s linear infinite;
   opacity: .6;
   background-image: var(--feed-pattern);
   background-size: 260px 180px;
@@ -325,6 +326,10 @@ input, textarea {
 }
 
 .noise-tile.flicker { animation: flicker 2.4s steps(1) infinite; }
+
+@keyframes far-drift {
+  to { translate: -260px -180px; }
+}
 
 @keyframes flicker {
   0%, 100% { opacity: 1; }
@@ -536,8 +541,23 @@ input, textarea {
   .hud-subject,
   .rec::before,
   .feed-static,
+  .wall-far,
   .noise-tile.flicker { animation: none; }
 }
+
+.header-right { display: flex; align-items: center; gap: calc(var(--space) * 3); }
+
+.sound-toggle {
+  padding: 2px calc(var(--space) * 1.25);
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .08em;
+}
+
+.sound-toggle[aria-pressed="true"] { border-color: var(--primary); color: var(--primary); }
 
 .stage { position: fixed; inset: 0; width: auto; }
 .stage .wall { position: absolute; inset: 0; margin: 0; }
@@ -567,4 +587,5 @@ input, textarea {
   .site-footer { padding: 0 calc(var(--space) * 2); }
   .site-header nav { gap: calc(var(--space) * 1.5); }
   .site-header nav a { font-size: .75rem; letter-spacing: .05em; }
+  .sound-toggle { display: none; }
 }

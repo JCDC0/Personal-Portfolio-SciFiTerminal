@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { imageUrl } from '../imageUrl.js'
 import { useClock, useElementSize, useMediaQuery } from '../hooks.js'
+import { playLock, playMove, playOpen } from '../sound.js'
 
 const PLANE_W = 2400
 const PLANE_H = 1400
@@ -74,7 +75,7 @@ function buildNoise(slots) {
         height,
         depth: -Math.round(next() * 260),
         color: `hsl(${hue} ${Math.round(8 + next() * 17)}% ${Math.round(9 + next() * 22)}%)`,
-        flicker: next() < 0.15,
+        flicker: next() < 0.25,
         delay: `${(next() * 2).toFixed(2)}s`,
         label: width > 60 && next() < 0.3 ? `CAM ${1000 + Math.floor(next() * 9000)}` : null,
       })
@@ -160,13 +161,13 @@ export default function SurveillanceWall({ projects }) {
   const feedRefs = useRef([])
   const openTimer = useRef(null)
   const pointerDown = useRef(false)
+  const previousFocus = useRef(null)
   const size = useElementSize(viewportRef)
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
   const [focus, setFocus] = useState(null)
   const [opening, setOpening] = useState(false)
   const [scanning, setScanning] = useState(!reducedMotion)
-  const [hovered, setHovered] = useState(false)
   const [keyboardInside, setKeyboardInside] = useState(false)
 
   const slots = useMemo(() => projects.map((_, index) => slotFor(index)), [projects])
@@ -187,10 +188,20 @@ export default function SurveillanceWall({ projects }) {
   }, [focus])
 
   useEffect(() => {
-    if (!scanning || hovered || keyboardInside || opening || focus === null) return
+    if (focus === null) return
+    const moved = previousFocus.current !== null && previousFocus.current !== focus
+    previousFocus.current = focus
+    if (!moved) return
+    playMove()
+    const timer = setTimeout(playLock, TRAVEL_MS)
+    return () => clearTimeout(timer)
+  }, [focus])
+
+  useEffect(() => {
+    if (!scanning || keyboardInside || opening || focus === null) return
     const timer = setTimeout(() => setFocus((focus + 1) % projects.length), SCAN_MS)
     return () => clearTimeout(timer)
-  }, [scanning, hovered, keyboardInside, opening, focus, projects.length])
+  }, [scanning, keyboardInside, opening, focus, projects.length])
 
   useEffect(() => () => clearTimeout(openTimer.current), [])
 
@@ -208,6 +219,7 @@ export default function SurveillanceWall({ projects }) {
   }
 
   function open(index) {
+    playOpen()
     const to = `/projects/${projects[index].id}`
     if (reducedMotion) {
       navigate(to)
@@ -255,8 +267,6 @@ export default function SurveillanceWall({ projects }) {
         ref={viewportRef}
         className={`wall-viewport${opening ? ' is-opening' : ''}`}
         style={{ perspective: `${PERSPECTIVE}px` }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
