@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import express from 'express'
 import cors from 'cors'
 import { pool } from './db/pool.js'
@@ -78,6 +81,16 @@ app.post('/api/messages', async (request, response, next) => {
     next(error)
   }
 })
+
+const clientDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../client/dist')
+
+if (existsSync(clientDist)) {
+  app.use(express.static(clientDist))
+  app.get('*', (request, response, next) => {
+    if (request.path.startsWith('/api/') || path.extname(request.path)) return next()
+    response.sendFile(path.join(clientDist, 'index.html'))
+  })
+}
 
 app.use((request, response) => {
   response.status(404).json({ error: 'No such route' })
