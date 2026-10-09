@@ -9,6 +9,25 @@ import * as messages from './messagesRepo.js'
 
 const app = express()
 
+function basicAuth(request, response, next) {
+  const header = request.headers.authorization || ''
+  const user = process.env.BASIC_AUTH_USER
+  const pass = process.env.BASIC_AUTH_PASS
+
+  if (user && pass && header.startsWith('Basic ')) {
+    const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8')
+    const colon = decoded.indexOf(':')
+    if (colon !== -1 && decoded.slice(0, colon) === user && decoded.slice(colon + 1) === pass) {
+      return next()
+    }
+  }
+
+  response.set('WWW-Authenticate', 'Basic realm="portfolio"')
+  response.status(401).json({ error: 'Login required' })
+}
+
+app.use(basicAuth)
+
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
