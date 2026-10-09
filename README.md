@@ -5,9 +5,9 @@
 A personal portfolio for a computer science student, styled after the surveillance-machine interfaces in *Person of Interest*. It is built for recruiters: it shows each project as a problem, the solution that was built, and the tools used, with links to the live app and the source.
 
 **Live site (demo mode):** https://jcdc0.github.io/Personal-Portfolio-SciFiTerminal/
-**Full app with API and database:** runs locally for now (see [How to run it](#how-to-run-it)); deployed in week 3
+**Full app with API and database:** https://jcdc0-portfolio.onrender.com (behind a login, see below)
 
-> **The GitHub Pages site runs in demo mode.** Its backend is simulated in your browser, so it works without a server. Run the app locally, as below, to use the real Express API and PostgreSQL database. See [Demo mode](#demo-mode).
+> **Two addresses.** The GitHub Pages site runs in demo mode: its backend is simulated in your browser and nothing is saved to a database, so anyone can open it. The Render address is the real app, where one Express server serves the site and the API and the contact form writes to PostgreSQL. Because it writes to a database, it is behind an HTTP Basic Auth login; the login is shared privately with my instructor. The free host sleeps when idle, so the first load can take up to a minute. See [Demo mode](#demo-mode).
 
 ![The projects panel](docs/assets/projects.png)
 
@@ -109,6 +109,8 @@ None of these are committed. Each folder's `.env.example` lists them with placeh
 | `DATABASE_URL` | server | `postgresql://user:password@host.neon.tech/neondb?sslmode=require` | PostgreSQL connection string. Contains a password |
 | `CORS_ORIGINS` | server | `http://localhost:5173` | Comma-separated origins allowed to call the API |
 | `NODE_ENV` | server | `development` | `production` on a host |
+| `BASIC_AUTH_USER` | server | `change-me` | The login name for the whole site and API. Without it and the password, every request gets 401 |
+| `BASIC_AUTH_PASS` | server | `change-me-to-something-long` | The login password. Set it in the host's dashboard, never in the repository |
 | `VITE_USE_MOCK_API` | client, at build time | `false` | Only the exact value `false` turns demo mode off |
 | `VITE_API_BASE_URL` | client, at build time | `http://localhost:3000` | The API's address, no trailing slash |
 
@@ -180,14 +182,15 @@ docs/assets/            screenshots
 
 ## Known issues and next steps
 
-- **The API and database are not deployed yet.** In week 3, one Render service will serve both the site and the API from a custom domain behind Cloudflare Zero Trust, because the contact form writes to the database.
-- **The database accepts connections from any address.** Neon's free plan has no IP allow-list. It is protected by the password and TLS, and the app will get its own database user that can only read projects and add messages.
-- **The *Person of Interest* look is partly done.** The surveillance wall, the camera sounds (off by default; toggle in the header) and the dark Machine colours are in. The light Samaritan theme toggle is not built yet, and the other pages are still plain panels.
+- **Deployed on Render's free plan.** One web service builds the client and runs Express, which serves the site and `/api` from the same address. Build command: `npm --prefix client ci --include=dev && npm --prefix client run build && npm --prefix server ci`; start command: `node server/server.js`. The service sleeps after 15 minutes without visitors.
+- **The login is HTTP Basic Auth, not a full account system.** It is one shared username and password from the host's environment settings. I first planned Cloudflare Zero Trust on my own domain, but its free plan asks for payment details, so I used the instructor's other accepted option.
+- **The database accepts connections from any address.** Neon's free plan has no IP allow-list. It is protected by the password and TLS. The app still connects as the database owner; a separate user that can only read projects and add messages is the next step (the insert already returns only `id` and `created_at` to make that possible).
+- **The *Person of Interest* look is partly done.** The surveillance wall, the camera sounds (off by default; toggle in the header) and the dark Machine colours are in. Not built: the light Samaritan theme toggle, camera travel between the other pages (they are still plain panels), cards with 3D depth, a greyscale background, and trace lines that make the wall look like the Machine searching a directory.
 - **Fonts:** Jost and Space Mono (both free under the SIL Open Font Licence). The Futura PT and Magda Clean Mono fonts in the original design are commercial, so they are not used.
 
 ## AI use
 
-Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The parts I wrote are the project content (`client/src/api/seed.json`), the seed data (`server/db/seed.sql`) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
+Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The login gate was first drafted by GitHub Copilot and then rewritten by Claude Code. The parts I wrote are the project content (`client/src/api/seed.json`), the seed data (`server/db/seed.sql`) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
 
 ## Author
 
