@@ -139,6 +139,20 @@ The AI never committed anything: every commit in this repository was reviewed an
     - The About bio is taken from the "About Me" text on my own resume.
 - **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/93814a0 (the sounds and the freeze fix) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fc68b85 (the About page and resume link)
 
+### 2026-10-06 to 2026-10-09 - Deploying the real app behind a login
+
+- **Tools:** Claude Code, and GitHub Copilot in VS Code
+- **What I asked for:** A way to put the real app (site, API and database) online for grading, with the access gate my instructor requires because the contact form writes to the database.
+- **What it gave back:**
+    - Express now also serves the built React site, and any page address falls back to `index.html`, so one Render service runs everything from one address.
+    - A comparison of the two gates the instructor accepts. It checked Cloudflare's own setup page and found that the free Zero Trust plan still asks for payment details, so it recommended HTTP Basic Auth instead.
+    - Step-by-step Render settings, which I entered myself in Render's dashboard.
+- **What I kept, what I changed, and why:**
+    - I chose Basic Auth over Cloudflare. I tried writing the middleware from the AI's step list, but GitHub Copilot autocompleted almost all of it. That draft was never switched on with `app.use`, used different variable names, and broke on passwords containing a colon, so Claude Code rewrote it. **The gate is AI-written, not mine.**
+    - I reset my Neon password after pasting the connection string into a chat by mistake, and used the new one only in Render and my `.env`.
+    - I changed my own query to return only `id` and `created_at` (see section 3).
+- **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/6cefcc8 (serving the site), https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/4b57565 (my query change) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fbe9a40 (the gate)
+
 ## 2. Where the AI got it wrong
 
 ### Case 1 - It planned before reading the template
@@ -183,6 +197,13 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I did instead:** I reported the frozen cards, and it removed pause-on-hover completely. The scan now stops only when I click a card, use the arrow keys, or press the Auto-scan button.
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/93814a0
 
+### Case 7 - Render settings that broke the build
+
+- **What it gave me:** Render settings with `NODE_ENV=production` and the build command `npm --prefix client ci && npm --prefix client run build && npm --prefix server ci`.
+- **What was wrong with it:** With `NODE_ENV=production`, `npm ci` skips development packages, and Vite, the tool that builds the site, is one of them. My first deploy failed after 9 seconds with `vite: not found`, after installing only 11 packages.
+- **What I did instead:** I sent the failing log, and it added `--include=dev` to the client install. I changed the build command in Render and redeployed, and the site went live. `NODE_ENV` stays `production` for the running server.
+- **Commit:** none, because the fix was a setting in Render's dashboard, not code. The deploy it fixed is https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fbe9a40
+
 ## 3. Who wrote what
 
 Most of the code in this project was written by the AI. The parts below are mine. I typed them myself, using my own m5a3 activity as a reference, and fixed them after review.
@@ -207,7 +228,8 @@ Most of the code in this project was written by the AI. The parts below are mine
     - `SELECT * FROM projects WHERE id = $1` with `[id]`: gets one project. The `$1` is a placeholder. The id is sent to the database separately from the SQL text, so it can never be read as part of the command. If I glued the id into the string instead, someone could send SQL in the address bar and change the query (SQL injection).
     - `INSERT INTO messages (name, email, message) VALUES ($1, $2, $3) RETURNING *` with `[name, email, message]`: saves a contact message.
         - The three placeholders matter even more here, because these values are typed by visitors. A name with an apostrophe, like O'Brien, would break a string-joined query, and the same hole would let someone inject SQL.
-        - `RETURNING *` sends back the saved row with its new `id` and `created_at`, so the API can reply 201 with it without a second query.
+        - `RETURNING *` sent back the whole saved row with its new `id` and `created_at`, so the API can reply 201 without a second query.
+        - On 6 Oct I changed it to `RETURNING id, created_at` ([`4b57565`](https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/4b57565)). The page only needs to know the message was saved. Returning less also means a future database user for the app needs to read only those two columns, not everyone's messages.
 
 ### Written by me: the project content (`client/src/api/seed.json`)
 
