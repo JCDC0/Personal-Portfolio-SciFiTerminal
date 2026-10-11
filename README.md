@@ -13,14 +13,14 @@ A personal portfolio for a computer science student, styled after the surveillan
 
 ## Features and usage
 
-On a computer, the whole site is one 3D space (built with Three.js) styled as a virtual machine. An AI core of linked nodes sits in the middle, surrounded by file clusters, web lines that pulses travel along, and a faint 3D grid with coordinates at its far points. Every page is a panel somewhere in that space, and changing page flies the camera to it. A floating guide tag follows the camera during a flight ("Loading Contact Form..."), then docks beside the panel and plugs a yellow line into it. The first visit in a browser tab starts with a short, skippable `[ CONNECTING... ]` boot screen. You can drag empty space to look around.
+On a computer, the whole site is one 3D space (built with Three.js) styled as a virtual machine. An AI core of linked nodes sits in the middle, surrounded by file clusters, web lines that pulses travel along, and a faint 3D grid with coordinates at its far points. Every page is a panel somewhere in that space, and changing page flies the camera to it. A floating guide tag rides with the camera during a flight, typing "Loading Contact Form..." like a terminal, then docks beside the panel and plugs a yellow line into it (on the projects page, a second line runs to the record buttons). The first visit in a browser tab starts with a short, skippable `[ CONNECTING... ]` boot screen. The AI core pulses with the background music, and its packets travel out along the web to the far edges of the space. Each red panel has a technical frame with corner brackets, tick marks and a section code. You can drag empty space to look around.
 
 On a phone, or in a browser without WebGL, the site uses plain pages instead. With "reduce motion" on, the boot is skipped and the flights become cuts.
 
 | Route | What it shows |
 | --- | --- |
 | `/` | Home panel: the handle, a one-line pitch, and buttons to the projects and the contact form |
-| `/projects` | A stack of project record cards (`DB-001` to `DB-006`) under the query `SELECT * FROM projects ORDER BY id;`. The camera scans from card to card on its own; the locked card slides forward with the Prev / Next, Auto-scan and Open record buttons under it. Click a card to lock it, click again to open it; the arrow keys work too. Mobile apps show three phone screenshots side by side. It shows a loading line first, or an error with a *Try again* button. On a phone it is a plain list of cards |
+| `/projects` | A stack of project record cards (`DB-001` to `DB-006`) under the query `SELECT * FROM projects ORDER BY id;`. The camera scans from card to card on its own, down the stack and back up; the locked card slides forward with the Prev / Next, Auto-scan and Open record buttons under it. Click a card to lock it, click again to open it; the arrow keys work too. Mobile apps show three phone screenshots side by side. It shows a loading line first, or an error with a *Try again* button. On a phone it is a plain list of cards |
 | `/projects/:id` | One project: the problem, what was built, tech tags, links to the live site and source code, and its screenshots (for the mobile apps, a slowly scrolling reel of phone screens that pauses on hover). In the 3D world, the guide tag carries the **Back to projects** button. An unknown id shows "Project not found" |
 | `/about` | A short bio, skills, strengths and languages, with a link to my resume on Google Drive (the resume is not stored in this repository) |
 | `/contact` | A contact form (name, email, message) that saves to the database. On *Send* it shows "MESSAGE RECEIVED" or the server's error |
@@ -200,9 +200,15 @@ docs/assets/            screenshots
 - **Existing databases need the new column.** `schema.sql` adds `screenshots` with `ADD COLUMN IF NOT EXISTS`, so an existing database picks it up on the next `npm run db:reset`.
 - **Fonts:** Jost and Space Mono (both free under the SIL Open Font Licence). The Futura PT and Magda Clean Mono fonts in the original design are commercial, so they are not used.
 
+## Credits
+
+- **Music:** the background track (`client/public/audio/ambient.mp3`) is AI-generated. I made it with **Google Flow Music**.
+- **Fonts:** Jost and Space Mono, both under the SIL Open Font Licence.
+- **Inspiration:** the interfaces of the TV series *Person of Interest*. No logos, images or audio from the show are used.
+
 ## AI use
 
-Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The login gate was first drafted by GitHub Copilot and then rewritten by Claude Code. The background music was generated with Google Flow Music. The parts I wrote are the project content (`client/src/api/seed.json`), the seed rows in `server/db/seed.sql` (the two screenshot `UPDATE` lines at its end were added by Claude Code) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
+Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The login gate was first drafted by GitHub Copilot and then rewritten by Claude Code. The background music was generated with Google Flow Music (see [Credits](#credits)). The parts I wrote are the project content (`client/src/api/seed.json`), the seed rows in `server/db/seed.sql` (the two screenshot `UPDATE` lines at its end were added by Claude Code) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
 
 ## Author
 

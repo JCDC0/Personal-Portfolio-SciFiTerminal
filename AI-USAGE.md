@@ -192,8 +192,32 @@ The AI never committed anything: every commit in this repository was reviewed an
     - Cards that show three phone screens side by side.
     - A reel on the project page with all the phone screens, which scrolls slowly and pauses on hover.
     - Code that loops my track quietly when Sound is on, and advice to export it as an MP3.
-- **What I kept, what I changed, and why:** The screenshots are my own phone captures. The music is AI-generated: I made it with Google Flow Music, not by hand, so it is credited here and in the README.
+- **What I kept, what I changed, and why:** The screenshots are my own phone captures. The music is AI-generated: I made it with Google Flow Music, not by hand, so it is credited here and in the README's Credits section.
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
+### 2026-10-11 - Last design pass: a living core, Samaritan-style labels and technical frames
+
+- **Tools:** Claude Code, and Google Flow Music for the track the core reacts to
+- **What I asked for:**
+    - The pop-up labels (INDEX MATCH, PROBABILITY, NON-RELEVANT) in a Samaritan-style font.
+    - The AI core pulsing with the music instead of only rotating.
+    - Packets that travel to far nodes, not just around the core.
+    - The guide tag and its line moving with the camera, like the AI dragging me to the destination, instead of chasing me.
+    - A yellow line from the guide tag to the four record buttons.
+    - Technical lines on the red panel borders.
+    - The guide text typing like a terminal.
+    - Auto-scan going 1 to 6 and back, because jumping from 6 to 1 flew the camera across the whole stack and made me feel sick.
+- **What it gave back:**
+    - Labels drawn in Jost, uppercase with wide letter spacing.
+    - A sound analyser on the music: the core grows, glows and sends out ripple rings on the beat, with a slow heartbeat when the sound is off.
+    - Packets that hop outward up to ten times, with bigger glows the farther out they are.
+    - The guide locked to the camera during a flight.
+    - The new line from the guide to the buttons.
+    - Corner brackets, tick marks, a section code and a sync meter around each red panel.
+    - A typing animation with a blinking cursor.
+    - A scan that reverses at the ends.
+- **What I kept, what I changed, and why:** The real Samaritan interface font is not free to use, so the labels use Jost, the free Futura look-alike the site already uses. I kept the rest after checking it in my browser.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/1bfc1c3
 
 ## 2. Where the AI got it wrong
 

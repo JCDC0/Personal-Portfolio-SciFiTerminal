@@ -25,7 +25,7 @@ A personal web portfolio themed after the surveillance interfaces in *Person of 
 | `/contact` form that saves to my database | Built (Express API and PostgreSQL) |
 | Smooth transitions between pages | Built as camera flights through one 3D space (Three.js) |
 | Labelled boxes and bracket outlines like the Machine's view | Built (the HUD corners, record labels and the guide tag) |
-| Sound toggle | Built: generated interface sounds and a background track, off by default |
+| Sound toggle | Built: generated interface sounds and a background track made with Google Flow Music, off by default. The AI core pulses with the music |
 | Animations off for "reduce motion" | Built: no boot, and cuts instead of flights |
 
 ## Cut or moved to stretch goals
