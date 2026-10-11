@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getProject } from '../api'
-import { imageUrl } from '../imageUrl.js'
+import Gallery from '../components/Gallery.jsx'
+import { projectImages } from '../components/ProjectThumbs.jsx'
 
-export default function ProjectDetailPanel() {
-  const { id } = useParams()
+export default function ProjectDetailPanel({ id: idProp, embedded = false }) {
+  const params = useParams()
+  const id = idProp ?? params.id
   const [status, setStatus] = useState('loading')
   const [project, setProject] = useState(null)
   const [error, setError] = useState(null)
@@ -30,7 +32,7 @@ export default function ProjectDetailPanel() {
 
   return (
     <section className="panel">
-      <Link to="/projects" className="back">&lsaquo; Back to projects</Link>
+      {!embedded && <Link to="/projects" className="back">&lsaquo; Back to projects</Link>}
 
       {status === 'loading' && <p className="muted">Loading...</p>}
 
@@ -45,14 +47,10 @@ export default function ProjectDetailPanel() {
 
       {status === 'ready' && (
         <article className="feed-in">
-          <p className="mono muted">PROJECT // {String(project.id).padStart(3, '0')} // SIGNAL ACQUIRED</p>
+          <p className="mono muted">RECORD // DB-{String(project.id).padStart(3, '0')} // ACCESS GRANTED</p>
           <h1>{project.title}</h1>
 
-          {project.image_url && (
-            <figure className="shot">
-              <img src={imageUrl(project.image_url)} alt={`Screenshot of ${project.title}`} />
-            </figure>
-          )}
+          <Gallery title={project.title} images={projectImages(project)} />
 
           <h2>Problem</h2>
           {project.problem ? <p>{project.problem}</p> : <p className="muted">Not written yet.</p>}

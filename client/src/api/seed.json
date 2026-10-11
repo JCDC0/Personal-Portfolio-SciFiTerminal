@@ -26,6 +26,7 @@
     "summary": "My Capstone Thesis. A mobile application that allows you to control your phone with your voice, all without privacy issues and supports English, Tagalog, and Taglish using a fine-tuned Whisper-tiny model running on a mobile device. No Internet Connection or an LLM is needed. ",
     "tech": ["Android Accessibility Services", "Whisper (ONNX)", "Kotlin", "Speech Recognition"],
     "image_url": "shots/handsfree2.jpg",
+    "screenshots": ["shots/handsfree1.jpg", "shots/handsfree2.jpg", "shots/handsfree3.jpg"],
     "live_url": "",
     "repo_url": ""
   },
@@ -36,6 +37,7 @@
     "summary": "A Flutter app that allows the user full control of their conversations and decorate their messaging style with a variety of settings and full control of their chat context and LLM responses. Utilizes v1 or v2 Character Cards, BYOK, streaming replies, full background and text design controls, import and export text, settings, presets, and so much more.",
     "tech": ["Flutter","Dart","LLM APIs(OpenAI, OpenRouter, ETC)"],
     "image_url": "shots/airp-text.jpg",
+    "screenshots": ["shots/airp-text.jpg", "shots/airp-text2.jpg", "shots/airp-backgrounds.jpg", "shots/airp-background-test.jpg", "shots/airp-settings.jpg", "shots/airp-parameter-settings.jpg", "shots/airp-ui-settings.jpg"],
     "live_url": "",
     "repo_url": "https://github.com/JCDC0/AIRP"
   },

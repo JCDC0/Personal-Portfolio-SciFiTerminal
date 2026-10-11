@@ -1,44 +1,8 @@
-import { useEffect, useState } from 'react'
-import { listProjects } from '../api'
 import ProjectCard from '../components/ProjectCard.jsx'
-import SurveillanceWall from '../components/SurveillanceWall.jsx'
-import { useMediaQuery } from '../hooks.js'
+import { useProjects } from '../useProjects.js'
 
 export default function ProjectsPanel() {
-  const wide = useMediaQuery('(min-width: 769px)')
-  const [status, setStatus] = useState('loading')
-  const [projects, setProjects] = useState([])
-  const [error, setError] = useState(null)
-  const [slow, setSlow] = useState(false)
-
-  async function load() {
-    setStatus('loading')
-    setError(null)
-    const timer = setTimeout(() => setSlow(true), 3000)
-    try {
-      setProjects(await listProjects())
-      setStatus('ready')
-    } catch (caught) {
-      setError(caught)
-      setStatus('error')
-    } finally {
-      clearTimeout(timer)
-      setSlow(false)
-    }
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  if (status === 'ready' && projects.length > 0 && wide) {
-    return (
-      <section className="stage" aria-labelledby="projects-title">
-        <h1 id="projects-title" className="sr-only">Projects</h1>
-        <SurveillanceWall projects={projects} />
-      </section>
-    )
-  }
+  const { status, projects, error, slow, load } = useProjects()
 
   return (
     <section className="panel">

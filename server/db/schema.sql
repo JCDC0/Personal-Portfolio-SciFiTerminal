@@ -5,9 +5,12 @@ CREATE TABLE IF NOT EXISTS projects (
   summary   TEXT   NOT NULL DEFAULT '',
   tech      TEXT[] NOT NULL DEFAULT '{}',
   image_url TEXT   NOT NULL DEFAULT '',
+  screenshots TEXT[] NOT NULL DEFAULT '{}',
   live_url  TEXT   NOT NULL DEFAULT '',
   repo_url  TEXT   NOT NULL DEFAULT ''
 );
+
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS screenshots TEXT[] NOT NULL DEFAULT '{}';
 
 CREATE TABLE IF NOT EXISTS messages (
   id         SERIAL      PRIMARY KEY,
