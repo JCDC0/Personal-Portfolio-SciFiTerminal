@@ -9,6 +9,8 @@ let noiseBuffer = null
 let enabled = readStored()
 let music = null
 let fade = 0
+let analyser = null
+let levels = null
 
 function readStored() {
   try {
@@ -129,6 +131,29 @@ export function playGarble(kind = 'pulse') {
 
 const MUSIC_VOLUME = 0.35
 
+function listen() {
+  if (analyser || !music || !audio()) return
+  try {
+    const source = context.createMediaElementSource(music)
+    analyser = context.createAnalyser()
+    analyser.fftSize = 256
+    analyser.smoothingTimeConstant = 0.7
+    levels = new Uint8Array(analyser.frequencyBinCount)
+    source.connect(analyser)
+    analyser.connect(context.destination)
+  } catch {
+    analyser = null
+  }
+}
+
+export function musicLevel() {
+  if (!analyser || !enabled || !music || music.paused) return 0
+  analyser.getByteFrequencyData(levels)
+  let sum = 0
+  for (let i = 1; i < 20; i++) sum += levels[i]
+  return sum / (19 * 255)
+}
+
 function ambient(on) {
   if (music === false) return
   if (!music) {
@@ -138,6 +163,7 @@ function ambient(on) {
     music.volume = 0
     music.addEventListener('error', () => { music = false })
   }
+  listen()
   clearInterval(fade)
   if (on) music.play().catch(() => {})
   const goal = on ? MUSIC_VOLUME : 0

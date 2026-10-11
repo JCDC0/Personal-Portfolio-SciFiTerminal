@@ -57,7 +57,7 @@ function buildCore(texture) {
   linkGeometry.setAttribute('position', new THREE.Float32BufferAttribute(segments, 3))
   group.add(new THREE.LineSegments(linkGeometry, lineMaterial(WHITE, 0.2)))
 
-  group.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(points), new THREE.PointsMaterial({
+  const dots = new THREE.Points(new THREE.BufferGeometry().setFromPoints(points), new THREE.PointsMaterial({
     color: WHITE,
     size: 9,
     map: texture,
@@ -65,7 +65,8 @@ function buildCore(texture) {
     opacity: 0.7,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-  })))
+  }))
+  group.add(dots)
 
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({
     map: texture,
@@ -90,7 +91,7 @@ function buildCore(texture) {
   const ringGroup = new THREE.Group()
   rings.forEach((ring) => ringGroup.add(ring))
 
-  return { group, ringGroup, glow, rings, surface: points.slice(0, surface) }
+  return { group, ringGroup, glow, rings, dots, surface: points.slice(0, surface) }
 }
 
 function wireShape(kind) {
@@ -138,7 +139,7 @@ function setLine(line, points) {
   line.geometry.attributes.position.needsUpdate = true
 }
 
-export function createWorld({ gl, css, reducedMotion, built = true, onActivity = () => {} }) {
+export function createWorld({ gl, css, reducedMotion, built = true, onActivity = () => {}, level = () => 0 }) {
   const texture = glowTexture()
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0x000000)
@@ -372,7 +373,7 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
     reducedMotion,
   })
 
-  const pulses = Array.from({ length: 64 }, () => {
+  const pulses = Array.from({ length: 110 }, () => {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
       map: texture,
       color: YELLOW,
@@ -401,22 +402,25 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
 
   function webWalk() {
     const { nodes, links } = scenery.web
-    const hops = 2 + Math.floor(Math.random() * 4)
+    const hops = 4 + Math.floor(Math.random() * 7)
     const path = []
-    let previous = -1
+    const seen = new Set([0])
     let current = 0
     for (let i = 0; i < hops; i++) {
-      const options = links[current].filter((j) => j !== previous && j !== 0)
+      const options = links[current].filter((j) => !seen.has(j))
       if (!options.length) break
-      previous = current
-      current = options[Math.floor(Math.random() * options.length)]
+      const here = nodes[current].length()
+      const outward = options.filter((j) => nodes[j].length() > here)
+      const pool = outward.length && Math.random() < 0.85 ? outward : options
+      current = pool[Math.floor(Math.random() * pool.length)]
+      seen.add(current)
       path.push(current)
     }
     if (!path.length) return
     const start = nodes[path[0]].clone().normalize().multiplyScalar(CORE_RADIUS)
     const points = [start, ...path.map((index) => nodes[index])]
     const total = points.reduce((sum, point, index) => sum + (index ? point.distanceTo(points[index - 1]) : 0), 0)
-    const speed = 1800 + Math.random() * 1800
+    const speed = 2600 + Math.random() * 2400
     const last = path[path.length - 1]
     firePath(points, Math.random() < 0.3 ? YELLOW : WHITE, (total / speed) * 1000, () => {
       if (last >= 1 && last <= clusters.length) clusters[last - 1].flash = 1
@@ -457,8 +461,27 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
   const chain = polyline(3, lineMaterial(WHITE, 0.4))
   const plug = polyline(2, lineMaterial(YELLOW, 0.95))
   const tether = polyline(2, lineMaterial(YELLOW, 0.6))
-  chain.visible = plug.visible = tether.visible = false
-  scene.add(chain, plug, tether)
+  const wire = polyline(3, lineMaterial(YELLOW, 0.75))
+  chain.visible = plug.visible = tether.visible = wire.visible = false
+  scene.add(chain, plug, tether, wire)
+
+  const ripples = Array.from({ length: 4 }, () => {
+    const ring = new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(new THREE.EllipseCurve(0, 0, CORE_RADIUS, CORE_RADIUS).getPoints(96)),
+      lineMaterial(WHITE, 0)
+    )
+    ring.visible = false
+    scene.add(ring)
+    return { ring, start: 0 }
+  })
+  const beat = { level: 0, average: 0, last: 0, cycle: 0 }
+
+  function ripple(now, strength) {
+    const free = ripples.find((item) => !item.ring.visible) ?? ripples[0]
+    free.start = now
+    free.strength = strength
+    free.ring.visible = true
+  }
 
   const terminals = reducedMotion ? null : startTerminals({ scene: cssScene, onActivity, radius: CORE_RADIUS })
 
@@ -468,6 +491,7 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
   let flight = null
   let docked = false
   let plugStart = 0
+  let detach = null
   let guideShown = false
   let buildStart = built ? -Infinity : null
   const pointer = { x: 0, y: 0, sx: 0, sy: 0 }
@@ -534,6 +558,7 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
     if (changing) {
       docked = false
       plugStart = 0
+      if (guideShown) detach = { position: guideObject.position.clone(), quaternion: guideObject.quaternion.clone(), start: performance.now() }
     }
     const pose = poseFor(view)
     look.yaw = 0
@@ -643,6 +668,10 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
     if (reducedMotion) {
       guideObject.position.copy(goal)
       guideObject.quaternion.copy(quaternion)
+    } else if (!docked) {
+      const blend = detach ? easeInOut(Math.min((now - detach.start) / 450, 1)) : 1
+      guideObject.position.copy(detach ? detach.position.clone().lerp(goal, blend) : goal)
+      guideObject.quaternion.copy(detach ? detach.quaternion.clone().slerp(quaternion, blend) : quaternion)
     } else {
       guideObject.position.lerp(goal, rate)
       guideObject.quaternion.slerp(quaternion, rate)
@@ -677,6 +706,23 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
         .add(guideUp.clone().multiplyScalar(rowY))
       setLine(plug, [from, from.clone().lerp(dock.plugTo, easeInOut(t))])
     }
+
+    wire.visible = plug.visible && target.name === 'projects' && controls.object.visible
+    if (wire.visible) {
+      const t = THREE.MathUtils.clamp((now - plugStart - PLUG_MS) / PLUG_MS, 0, 1)
+      const ws = workspaces.projects
+      const from = guideObject.position.clone()
+        .add(guideRight.clone().multiplyScalar(-g.w / 4))
+        .add(guideUp.clone().multiplyScalar(-g.h / 2))
+      const end = controls.object.position.clone().add(ws.right.clone().multiplyScalar(-stack.controlsWidth / 2))
+      const elbow = new THREE.Vector3(from.x, end.y, from.z)
+      const legs = from.distanceTo(elbow) + elbow.distanceTo(end) || 1
+      const reach = easeInOut(t) * legs
+      const first = Math.min(reach, from.distanceTo(elbow))
+      const corner = from.clone().lerp(elbow, first / (from.distanceTo(elbow) || 1))
+      const tip = reach > first ? elbow.clone().lerp(end, (reach - first) / (elbow.distanceTo(end) || 1)) : corner
+      setLine(wire, [from, corner, tip])
+    }
   }
 
   function animate(now) {
@@ -689,15 +735,45 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
     let grow = 1
     if (buildStart === null) grow = 0.001
     else if (buildStart !== -Infinity) grow = Math.max(0.001, easeOutBack(Math.min((now - buildStart) / 2400, 1)))
-    core.group.scale.setScalar(grow)
-    core.ringGroup.scale.setScalar(Math.min(1, grow * 1.1))
+    const music = reducedMotion ? 0 : level()
+    beat.level += (music - beat.level) * Math.min(1, delta * 14)
+    beat.average += (beat.level - beat.average) * Math.min(1, delta * 1.5)
+    const heart = reducedMotion ? 0 : Math.pow(Math.max(0, Math.sin(time * 2.4)), 8)
+    core.group.scale.setScalar(grow * (1 + heart * 0.035 + beat.level * 0.2))
+    core.ringGroup.scale.setScalar(Math.min(1, grow * 1.1) * (1 + beat.level * 0.08))
+    core.dots.material.opacity = Math.min(1, 0.6 + heart * 0.2 + beat.level * 0.5)
+
+    if (!reducedMotion && grow >= 1) {
+      const cycle = Math.floor((time * 2.4 + Math.PI / 2) / (Math.PI * 2))
+      if (music > 0.02) {
+        if (beat.level > 0.18 && beat.level > beat.average * 1.25 && now - beat.last > 380) {
+          beat.last = now
+          ripple(now, Math.min(1, beat.level * 2))
+        }
+      } else if (cycle !== beat.cycle) {
+        ripple(now, 0.5)
+      }
+      beat.cycle = cycle
+    }
+    ripples.forEach((item) => {
+      if (!item.ring.visible) return
+      const t = (now - item.start) / 1500
+      if (t >= 1) {
+        item.ring.visible = false
+        return
+      }
+      item.ring.position.copy(core.group.position)
+      item.ring.quaternion.copy(camera.quaternion)
+      item.ring.scale.setScalar(1 + easeInOut(t) * 1.4)
+      item.ring.material.opacity = (1 - t) * 0.45 * item.strength
+    })
 
     if (!reducedMotion) {
       core.group.rotation.y += delta * 0.06
       core.group.rotation.x = Math.sin(time * 0.2) * 0.12
       core.ringGroup.rotation.y -= delta * 0.08
       core.rings.forEach((ring, index) => { ring.rotation.z += delta * (0.05 + index * 0.03) })
-      core.glow.material.opacity = 0.3 + Math.sin(time * 1.7) * 0.08
+      core.glow.material.opacity = 0.24 + heart * 0.14 + beat.level * 0.5
       dust.rotation.y += delta * 0.004
       Object.values(workspaces).forEach((ws) => {
         if (ws.shape) ws.shape.rotation.y += delta * 0.12
@@ -739,6 +815,8 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
       const span = pulse.lengths[segment] - pulse.lengths[segment - 1] || 1
       const along = (travelled - pulse.lengths[segment - 1]) / span
       pulse.sprite.position.lerpVectors(pulse.points[segment - 1], pulse.points[segment], along)
+      const size = 80 + pulse.sprite.position.length() * 0.02
+      pulse.sprite.scale.set(size, size, 1)
       pulse.sprite.material.opacity = t < 0.05 ? t * 20 : t > 0.9 ? (1 - t) / 0.1 : 1
       if (t >= 1) {
         pulse.active = false

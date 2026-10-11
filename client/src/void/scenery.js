@@ -16,6 +16,7 @@ const TRACE_TEXT = [
   ['ROUTE 14.0%', 'rgba(61,123,255,.9)', '#fff'],
 ]
 const TRACE_COLORS = [RED, RED, YELLOW, YELLOW, BLUE, WHITE]
+const SAMARITAN_FONT = '500 26px Jost, sans-serif'
 
 function randomDirection(next, flatten = 1) {
   return new THREE.Vector3(next() * 2 - 1, (next() * 2 - 1) * flatten, next() * 2 - 1).normalize()
@@ -282,7 +283,7 @@ function makeTrace(next, scene) {
   line.frustumCulled = false
   const labels = Array.from({ length: 2 }, () => {
     const [text, background, ink] = TRACE_TEXT[Math.floor(next() * TRACE_TEXT.length)]
-    const sprite = textSprite(text, { color: ink, background, scale: 1.3 })
+    const sprite = textSprite(text, { color: ink, background, scale: 1.3, font: SAMARITAN_FONT, spacing: 3, pad: 12 })
     sprite.material.opacity = 0
     scene.add(sprite)
     return sprite
@@ -380,6 +381,9 @@ export function buildScenery({ scene, texture, coreRadius, avoid, fileClusters, 
   scene.add(web.lines)
 
   const traces = Array.from({ length: 9 }, () => makeTrace(next, scene))
+  if (document.fonts) {
+    document.fonts.load(SAMARITAN_FONT).then(() => traces.forEach((trace) => trace.labels.forEach((label) => label.userData.redraw()))).catch(() => {})
+  }
   const traceAnchors = centres.filter((point) => point.length() < 8000)
 
   let lastFlicker = 0

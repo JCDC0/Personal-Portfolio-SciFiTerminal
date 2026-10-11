@@ -8,7 +8,7 @@ import NotFoundPanel from '../pages/NotFoundPanel.jsx'
 import ProjectDetailPanel from '../pages/ProjectDetailPanel.jsx'
 import DemoNotice from '../components/DemoNotice.jsx'
 import { useMediaQuery } from '../hooks.js'
-import { playGarble, playLock, playMove, playOpen } from '../sound.js'
+import { musicLevel, playGarble, playLock, playMove, playOpen } from '../sound.js'
 import { useProjects } from '../useProjects.js'
 import { createWorld } from './world.js'
 import { WORKSPACES, workspaceFor } from './layout.js'
@@ -20,6 +20,15 @@ import VoidHud from './VoidHud.jsx'
 
 const BOOT_KEY = 'portfolio:booted'
 const SCAN_MS = 4000
+const TYPE_MS = 28
+const FRAME_CODES = {
+  home: 'SEC-01 // HOME TERMINAL // 0x08A9',
+  projects: 'SEC-02 // RECORDS // 0x2215',
+  detail: 'SEC-02A // RECORD VIEWER // 0x2216',
+  about: 'SEC-03 // PROFILE // 0x1F40',
+  contact: 'SEC-04 // RELAY // 0x7C21',
+  missing: 'SEC-404 // NULL SECTOR // 0x0000',
+}
 
 function bootedThisVisit() {
   try {
@@ -29,12 +38,35 @@ function bootedThisVisit() {
   }
 }
 
-function Guide({ label, state, detail, children }) {
+function Typed({ text, instant }) {
+  const [count, setCount] = useState(instant ? text.length : 0)
+
+  useEffect(() => {
+    if (instant) {
+      setCount(text.length)
+      return
+    }
+    setCount(0)
+    let typed = 0
+    const timer = setInterval(() => {
+      typed += 1
+      setCount(typed)
+      if (typed >= text.length) clearInterval(timer)
+    }, TYPE_MS)
+    return () => clearInterval(timer)
+  }, [text, instant])
+
+  return text.slice(0, count)
+}
+
+function Guide({ label, state, detail, instant, children }) {
+  const text = state === 'online' ? `${label} // ${detail ?? 'ONLINE'}` : `Loading ${label}...`
   return (
     <div className={`ws-tag is-${state}`}>
       <div className="ws-tag-row" aria-hidden="true">
         <span className="ws-tag-dot" />
-        {state === 'online' ? `${label} // ${detail ?? 'ONLINE'}` : `Loading ${label}...`}
+        <span className="ws-tag-prompt">&gt;</span>
+        <span><Typed text={text} instant={instant} /><span className="ws-tag-caret" /></span>
       </div>
       {children}
     </div>
@@ -47,6 +79,7 @@ export default function VoidSpace() {
   const pointerDown = useRef(false)
   const previousFocus = useRef(null)
   const lastFocus = useRef(0)
+  const scanDirection = useRef(1)
   const location = useLocation()
   const navigate = useNavigate()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
@@ -75,6 +108,7 @@ export default function VoidSpace() {
       reducedMotion,
       built: !booting,
       onActivity: (kind) => playGarble(kind),
+      level: musicLevel,
     })
     setWorld(instance)
     document.body.classList.add('immersive')
@@ -148,7 +182,14 @@ export default function VoidSpace() {
 
   useEffect(() => {
     if (!scanning || reducedMotion || focus === null || name !== 'projects') return
-    const timer = setTimeout(() => setFocus((focus + 1) % projects.length), SCAN_MS)
+    const timer = setTimeout(() => {
+      let next = focus + scanDirection.current
+      if (next < 0 || next >= projects.length) {
+        scanDirection.current = -scanDirection.current
+        next = focus + scanDirection.current
+      }
+      setFocus(Math.min(projects.length - 1, Math.max(0, next)))
+    }, SCAN_MS)
     return () => clearTimeout(timer)
   }, [scanning, reducedMotion, focus, name, projects.length])
 
@@ -188,11 +229,22 @@ export default function VoidSpace() {
     setFocus(index)
   }
 
-  function panel(key, content, anchor = world?.anchors[key], portalKey = key) {
+  function panel(key, content, anchor = world?.anchors[key], portalKey = key, framed = true) {
     if (!world || !anchor) return null
     const active = key === name
     return createPortal(
-      <div className={`ws-panel${active ? ' is-active' : ''}`} aria-hidden={!active} inert={active ? undefined : ''}>
+      <div
+        className={`ws-panel${framed ? ' is-framed' : ''}${active ? ' is-active' : ''}`}
+        data-code={framed ? FRAME_CODES[key] : undefined}
+        aria-hidden={!active}
+        inert={active ? undefined : ''}
+      >
+        {framed && (
+          <div className="panel-tech" aria-hidden="true">
+            <span>NODE {key.toUpperCase()} // SYNC OK</span>
+            <span className="panel-meter" />
+          </div>
+        )}
         {content}
       </div>,
       anchor,
@@ -229,7 +281,7 @@ export default function VoidSpace() {
           onFocus={() => handleCardFocus(index)}
           onPointer={() => { pointerDown.current = true }}
         />
-      ), anchor, `card-${projects[index].id}`))}
+      ), anchor, `card-${projects[index].id}`, false))}
 
       {world && name === 'projects' && count > 0 && createPortal(
         <div className="vm-controls">
@@ -244,7 +296,7 @@ export default function VoidSpace() {
       )}
 
       {world && !booting && createPortal(
-        <Guide label={WORKSPACES[name].label} state={online ? 'online' : 'loading'} detail={guideDetail}>
+        <Guide label={WORKSPACES[name].label} state={online ? 'online' : 'loading'} detail={guideDetail} instant={reducedMotion}>
           {online && name === 'detail' && (
             <Link to="/projects" className="button secondary ws-tag-action" onClick={() => playMove()}>
               &lsaquo; Back to projects
