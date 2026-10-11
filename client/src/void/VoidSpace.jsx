@@ -288,7 +288,7 @@ export default function VoidSpace() {
           <button type="button" className="secondary" onClick={() => step(-1)}>&lsaquo; Prev record</button>
           <button type="button" className="secondary" onClick={() => step(1)}>Next record &rsaquo;</button>
           <button type="button" className="secondary" aria-pressed={scanning} onClick={() => setScanning(!scanning)}>
-            Auto-scan: {scanning ? 'on' : 'off'}
+            Auto-scroll: {scanning ? 'on' : 'off'}
           </button>
           <button type="button" disabled={focus === null} onClick={() => open(focus)}>Open record</button>
         </div>,

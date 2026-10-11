@@ -719,3 +719,16 @@ main.void > * { width: auto; }
   .ws-tag-caret,
   .ws-panel.is-active .panel-meter { animation: none; }
 }
+
+.vm-guide .ws-tag { position: relative; }
+
+.vm-guide .ws-tag::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  bottom: -1px;
+  width: calc((100% + 2px) * var(--tow, 1));
+  height: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgb(229 255 0 / .7);
+}

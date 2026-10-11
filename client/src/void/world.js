@@ -492,6 +492,7 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
   let docked = false
   let plugStart = 0
   let detach = null
+  const travel = { direction: new THREE.Vector3(), t: 1 }
   let guideShown = false
   let buildStart = built ? -Infinity : null
   const pointer = { x: 0, y: 0, sx: 0, sy: 0 }
@@ -559,6 +560,7 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
       docked = false
       plugStart = 0
       if (guideShown) detach = { position: guideObject.position.clone(), quaternion: guideObject.quaternion.clone(), start: performance.now() }
+      guide.style.setProperty('--tow', reducedMotion ? '1' : '0')
     }
     const pose = poseFor(view)
     look.yaw = 0
@@ -669,6 +671,11 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
       guideObject.position.copy(goal)
       guideObject.quaternion.copy(quaternion)
     } else if (!docked) {
+      const time = now / 1000
+      const lead = Math.sin(Math.PI * travel.t) * depth * 0.22
+      goal.add(travel.direction.clone().multiplyScalar(lead))
+        .add(right.clone().multiplyScalar(Math.sin(time * 1.3) * 26))
+        .add(up.clone().multiplyScalar(Math.cos(time * 1.1) * 18))
       const blend = detach ? easeInOut(Math.min((now - detach.start) / 450, 1)) : 1
       guideObject.position.copy(detach ? detach.position.clone().lerp(goal, blend) : goal)
       guideObject.quaternion.copy(detach ? detach.quaternion.clone().slerp(quaternion, blend) : quaternion)
@@ -860,11 +867,21 @@ export function createWorld({ gl, css, reducedMotion, built = true, onActivity =
       const e = easeInOut(t)
       const a = flight.from.clone().lerp(flight.control, e)
       const b = flight.control.clone().lerp(flight.to, e)
+      const ahead = Math.min(e + 0.02, 1)
+      const aheadA = flight.from.clone().lerp(flight.control, ahead)
+      const aheadB = flight.control.clone().lerp(flight.to, ahead)
+      const was = current.pos.clone()
       current.pos.copy(a.lerp(b, e))
+      const step = aheadA.lerp(aheadB, ahead).sub(current.pos)
+      if (step.lengthSq() > 1) travel.direction.copy(step.normalize())
+      else if (current.pos.distanceToSquared(was) > 1) travel.direction.copy(current.pos.clone().sub(was).normalize())
+      travel.t = t
+      guide.style.setProperty('--tow', t.toFixed(3))
       current.look.lerpVectors(flight.lookFrom, flight.lookTo, e)
       if (t >= 1) {
         const done = flight.resolve
         flight = null
+        travel.t = 1
         if (!docked) {
           docked = true
           plugStart = now + 250
