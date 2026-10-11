@@ -219,6 +219,20 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I kept, what I changed, and why:** The real Samaritan interface font is not free to use, so the labels use Jost, the free Futura look-alike the site already uses. I kept the rest after checking it in my browser.
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/1bfc1c3
 
+### 2026-10-12 - The guide tows the camera, and Auto-scroll
+
+- **Tool:** Claude Code
+- **What I asked for:**
+    - During a flight, a yellow line on the guide tag's bottom border, so it looks like the tag is pulling me to the page.
+    - The tag should keep moving around while it pulls me, instead of looking frozen on the screen.
+    - The Auto-scan button renamed to Auto-scroll, so visitors know the page moves by itself.
+- **What it gave back:**
+    - A yellow bar along the tag's bottom border that fills from 0 to 100% as the flight progresses.
+    - The tag now leads slightly ahead in the direction of travel and sways gently.
+    - The new button label.
+- **What I kept, what I changed, and why:** I kept all three after checking the flights in my browser.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/8a4b25e
+
 ## 2. Where the AI got it wrong
 
 ### Case 1 - It planned before reading the template
