@@ -9,22 +9,26 @@ A personal portfolio for a computer science student, styled after the surveillan
 
 > **Two addresses.** The GitHub Pages site runs in demo mode: its backend is simulated in your browser and nothing is saved to a database, so anyone can open it. The Render address is the real app, where one Express server serves the site and the API and the contact form writes to PostgreSQL. Because it writes to a database, it is behind an HTTP Basic Auth login; the login is shared privately with my instructor. The free host sleeps when idle, so the first load can take up to a minute. See [Demo mode](#demo-mode).
 
-![The projects panel](docs/assets/projects.png)
+![The project records in the 3D world](docs/assets/projects.png)
 
 ## Features and usage
+
+On a computer, the whole site is one 3D space (built with Three.js) styled as a virtual machine. An AI core of linked nodes sits in the middle, surrounded by file clusters, web lines that pulses travel along, and a faint 3D grid with coordinates at its far points. Every page is a panel somewhere in that space, and changing page flies the camera to it. A floating guide tag follows the camera during a flight ("Loading Contact Form..."), then docks beside the panel and plugs a yellow line into it. The first visit in a browser tab starts with a short, skippable `[ CONNECTING... ]` boot screen. You can drag empty space to look around.
+
+On a phone, or in a browser without WebGL, the site uses plain pages instead. With "reduce motion" on, the boot is skipped and the flights become cuts.
 
 | Route | What it shows |
 | --- | --- |
 | `/` | Home panel: the handle, a one-line pitch, and buttons to the projects and the contact form |
-| `/projects` | A full-screen surveillance wall. Each project is a camera feed with its screenshot, and the camera scans from feed to feed on its own. Click a feed to lock on, click again to open it; the arrow keys and the Prev / Next buttons move the camera by hand. On a phone, or with reduced motion on, it falls back to a plain list of cards. It shows a loading line first, or an error with a *Try again* button |
-| `/projects/:id` | One project: the problem, what was built, tech tags, and links to the live site and source code. An unknown id shows "Project not found" |
+| `/projects` | A stack of project record cards (`DB-001` to `DB-006`) under the query `SELECT * FROM projects ORDER BY id;`. The camera scans from card to card on its own; the locked card slides forward with the Prev / Next, Auto-scan and Open record buttons under it. Click a card to lock it, click again to open it; the arrow keys work too. Mobile apps show three phone screenshots side by side. It shows a loading line first, or an error with a *Try again* button. On a phone it is a plain list of cards |
+| `/projects/:id` | One project: the problem, what was built, tech tags, links to the live site and source code, and its screenshots (for the mobile apps, a slowly scrolling reel of phone screens that pauses on hover). In the 3D world, the guide tag carries the **Back to projects** button. An unknown id shows "Project not found" |
 | `/about` | A short bio, skills, strengths and languages, with a link to my resume on Google Drive (the resume is not stored in this repository) |
 | `/contact` | A contact form (name, email, message) that saves to the database. On *Send* it shows "MESSAGE RECEIVED" or the server's error |
-| anything else | A 404 panel with a link back home |
+| anything else | A 404 "Null Sector" panel with a link back home |
 
-The header and footer navigation reach every panel, so no page is a dead end.
+The header and footer navigation reach every panel, so no page is a dead end. **Sound** in the header (off by default) turns on generated interface sounds and a looping background track.
 
-**The main flow:** open the site, click **View projects**, open a project card, read it, click **Back to projects**, then use **Contact** to send a message.
+**The main flow:** open the site, click **View projects**, open a project card, read it, click **Back to projects** on the guide tag, then use **Contact** to send a message.
 
 ### API
 
@@ -47,7 +51,8 @@ A project looks like this:
   "problem": "Arcade players that ... want to practice Tetris ...",
   "summary": "A Tetr.io-inspired stacker ...",
   "tech": ["JavaScript", "HTML Canvas", "Web Audio API", "esbuild"],
-  "image_url": "",
+  "image_url": "shots/uloltrisgame.jpg",
+  "screenshots": [],
   "live_url": "",
   "repo_url": "https://github.com/JCDC0/ulolTris"
 }
@@ -134,7 +139,7 @@ It prints `API listening on http://localhost:3000`. Open http://localhost:3000/r
 npm run dev
 ```
 
-Open http://localhost:5173. There is no yellow demo notice, and **Projects** shows the five projects from the database after a short loading line.
+Open http://localhost:5173. There is no yellow demo notice, and **Projects** shows the six projects from the database after a short loading line.
 
 To build the production version of the client:
 
@@ -158,17 +163,22 @@ Both implementations (`mockApi.js` and `httpApi.js`) export the same three funct
 ```
 client/                 React 18 + Vite front end
   src/api/              index.js picks mockApi.js or httpApi.js; seed.json is the demo data
-  src/components/       Header, Footer, ProjectCard, SurveillanceWall, SoundToggle, DemoNotice
-  src/sound.js          the camera sound effects, generated with the Web Audio API
+  src/components/       Header, Footer, CurveEdge, ProjectCard, ProjectThumbs, Gallery, SoundToggle, DemoNotice
+  src/void/             the 3D world: world.js (scene, camera, guide tag), scenery.js, terminals.js,
+                        VoidSpace.jsx (routes to panels), RecordCard, ProjectStack, BootSequence, VoidHud
+  src/useProjects.js    loads the projects with the loading, empty, error and slow-server states
+  src/sound.js          interface sounds generated with the Web Audio API, and the background track
   src/links.js          the resume (Google Drive) and GitHub links
   src/pages/            one panel per route: Home, Projects, ProjectDetail, About, Contact, NotFound
   src/styles.css        the Machine (dark) and Samaritan (light) colour tokens
+  public/shots/         project screenshots, resized for the web
+  public/audio/         ambient.mp3, the background track
 server/                 Express API
   server.js             routes, input validation and error handling
   projectsRepo.js       SQL for projects (read only)
   messagesRepo.js       SQL for contact messages (insert)
   db/schema.sql         the projects and messages tables, with length limits enforced by the database
-  db/seed.sql           the five projects
+  db/seed.sql           the six projects and the mobile apps' screenshot lists
   db/pool.js, db/run.js the connection pool, and the runner behind npm run db:reset
 docs/assets/            screenshots
 .github/workflows/      builds the client and deploys the demo to GitHub Pages
@@ -185,12 +195,14 @@ docs/assets/            screenshots
 - **Deployed on Render's free plan.** One web service builds the client and runs Express, which serves the site and `/api` from the same address. Build command: `npm --prefix client ci --include=dev && npm --prefix client run build && npm --prefix server ci`; start command: `node server/server.js`. The service sleeps after 15 minutes without visitors.
 - **The login is HTTP Basic Auth, not a full account system.** It is one shared username and password from the host's environment settings. I first planned Cloudflare Zero Trust on my own domain, but its free plan asks for payment details, so I used the instructor's other accepted option.
 - **The database accepts connections from any address.** Neon's free plan has no IP allow-list. It is protected by the password and TLS. The app still connects as the database owner; a separate user that can only read projects and add messages is the next step (the insert already returns only `id` and `created_at` to make that possible).
-- **The *Person of Interest* look is partly done.** The surveillance wall, the camera sounds (off by default; toggle in the header) and the dark Machine colours are in. Not built: the light Samaritan theme toggle, camera travel between the other pages (they are still plain panels), cards with 3D depth, a greyscale background, and trace lines that make the wall look like the Machine searching a directory.
+- **Not built from the proposal:** the light Samaritan theme toggle (its colours exist in `styles.css`, but there is no switch), and tech filter tags on the projects page. The first camera wall (3 October) was replaced by the 3D world on 10-11 October.
+- **The 3D world needs WebGL and a reasonable graphics chip.** It caps the pixel ratio at 1.5, but an old laptop may still run it slowly. Phones always get the plain pages.
+- **Existing databases need the new column.** `schema.sql` adds `screenshots` with `ADD COLUMN IF NOT EXISTS`, so an existing database picks it up on the next `npm run db:reset`.
 - **Fonts:** Jost and Space Mono (both free under the SIL Open Font Licence). The Futura PT and Magda Clean Mono fonts in the original design are commercial, so they are not used.
 
 ## AI use
 
-Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The login gate was first drafted by GitHub Copilot and then rewritten by Claude Code. The parts I wrote are the project content (`client/src/api/seed.json`), the seed data (`server/db/seed.sql`) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
+Built with **Claude Code** (Anthropic), which wrote most of the code: the React client, the Express routes and validation, and the database schema. The login gate was first drafted by GitHub Copilot and then rewritten by Claude Code. The background music was generated with Google Flow Music. The parts I wrote are the project content (`client/src/api/seed.json`), the seed rows in `server/db/seed.sql` (the two screenshot `UPDATE` lines at its end were added by Claude Code) and the three SQL queries in `server/projectsRepo.js` and `server/messagesRepo.js`. I also chose the features, the validation rules, the database and the hosting, and I tested every step. The full record, including where the AI got it wrong, is in [AI-USAGE.md](AI-USAGE.md).
 
 ## Author
 

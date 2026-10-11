@@ -153,6 +153,48 @@ The AI never committed anything: every commit in this repository was reviewed an
     - I changed my own query to return only `id` and `created_at` (see section 3).
 - **Commits:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/6cefcc8 (serving the site), https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/4b57565 (my query change) and https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fbe9a40 (the gate)
 
+### 2026-10-09 to 2026-10-11 - The site as one 3D virtual machine
+
+- **Tool:** Claude Code
+- **What I asked for:** The whole portfolio as one 3D "virtual machine", like the Machine's view in *Person of Interest*. I wanted an AI core in the middle of a deep, empty space, every page a workspace somewhere in it, and camera flights between pages so the site feels like one seamless screen. I drew a sketch of a line running from the AI, through a "Loading Contact Form..." tag, to the page. I added ideas as I saw each version:
+    - a `[ CONNECTING... ]` boot screen;
+    - database names (`DB-004`) instead of cameras;
+    - an obfuscated "middleman" object with a scrambling `Owner J832=...` label;
+    - garbled noise when things move;
+    - a floating guide tag that follows me and plugs my line into the page;
+    - project cards that stack, with buttons that move with them;
+    - a 3D grid with coordinates;
+    - web lines that pulses travel along.
+- **What it gave back:**
+    - `client/src/void/`: a Three.js scene with:
+        - the AI core and the file clusters;
+        - pop-up terminals that type and sort to-do lists;
+        - neural strands, hidden square clusters and coloured traces;
+        - a field of about 1,500 faint thumbnails and folder icons, some joined by faint straight lines, like my concept image of the Machine's feeds;
+        - the 3D grid.
+    - My pages are the real React panels, placed in 3D with Three.js's CSS3DRenderer, so the forms and links still work.
+    - The guide tag, the camera flights (a curved path that speeds up and slows down), the record cards and the boot sequence.
+    - Fallbacks: phones get the plain pages, and "reduce motion" skips the boot and the flights.
+    - A clean curved line on the header and footer.
+- **What I kept, what I changed, and why:** I kept the structure and kept steering the look:
+    - I asked for the guide tag to follow me instead of staying beside each page.
+    - I asked for separate cards instead of table rows, and for the buttons to move with the cards instead of staying fixed on the screen.
+    - Three times I caught something that looked wrong and had it fixed (section 2, cases 8 to 10).
+    - The old camera wall was deleted once the new world replaced it.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
+### 2026-10-11 - Screenshot galleries for my mobile apps, and music
+
+- **Tools:** Claude Code, and Google Flow Music
+- **What I asked for:** More screenshots for my two mobile apps, HandsFree and AIRP, because one tall phone screenshot was cropped and zoomed inside a wide thumbnail. I also made a background track with Google Flow Music and asked how to add it.
+- **What it gave back:**
+    - A `screenshots` text-array column in `schema.sql`, the screenshot lists for both apps, and the extra screenshots resized for the web.
+    - Cards that show three phone screens side by side.
+    - A reel on the project page with all the phone screens, which scrolls slowly and pauses on hover.
+    - Code that loops my track quietly when Sound is on, and advice to export it as an MP3.
+- **What I kept, what I changed, and why:** The screenshots are my own phone captures. The music is AI-generated: I made it with Google Flow Music, not by hand, so it is credited here and in the README.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
 ## 2. Where the AI got it wrong
 
 ### Case 1 - It planned before reading the template
@@ -204,6 +246,39 @@ The AI never committed anything: every commit in this repository was reviewed an
 - **What I did instead:** I sent the failing log, and it added `--include=dev` to the client install. I changed the build command in Render and redeployed, and the site went live. `NODE_ENV` stays `production` for the running server.
 - **Commit:** none, because the fix was a setting in Render's dashboard, not code. The deploy it fixed is https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/fbe9a40
 
+### Case 8 - A curved header that cut the text
+
+- **What it gave me:** A "fisheye" curve on the header and footer, made with an SVG displacement filter that shifts the pixels of the whole bar. Its first version also curved the opposite way to the reference image I sent.
+- **What was wrong with it:** The filter moves pixels in whole steps, so the edge rose in jagged one- or two-pixel jumps, and letters looked cut off where a jump passed through them. The AI's own screenshot check did not catch it.
+- **What I did instead:** I asked for one clean curved line. The filter was removed. The curve is now drawn as a vector line in an SVG (`CurveEdge.jsx`) behind the text, so no letters move.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
+### Case 9 - Strands of hair and painfully bright shapes
+
+- **What it gave me:** Neural strands made from randomly wandering paths. The wireframe shapes, the file clusters and the middleman were all drawn at different brightness levels.
+- **What was wrong with it:** The strands curled like hairs instead of looking like lines between points, and some shapes were much brighter than others, which was harsh to look at next to the subtle ones.
+- **What I did instead:** I described what I saw, and it made these changes:
+    - The strands are now straight lines between vertex points.
+    - The coloured traces only turn at 45-degree angles.
+    - The hidden squares sit on a grid.
+    - Every shape was dimmed to the same subtle level.
+    - The middleman, a knotted torus with a solid black core, was still the harshest shape, so it became a faint dodecahedron.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
+### Case 10 - One phone screenshot in a desktop-sized frame
+
+- **What it gave me:** A project gallery that showed one screenshot at a time, in the same wide frame used for desktop screenshots.
+- **What was wrong with it:** A tall phone screenshot in a wide frame is small and leaves most of the frame empty. That looked bad, and it was the reason I asked for more screenshots in the first place.
+- **What I did instead:** I asked for the phone screenshots to be shown together and to scroll slowly. The page now shows every phone screen side by side in a reel that moves on its own.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
+### Case 11 - The music code broke the Sound button
+
+- **What it gave me:** Code to loop my background track under the Sound toggle.
+- **What was wrong with it:** The Sound button looked stuck: clicking it saved the setting but did not change the label or the sound until the page was reloaded. The AI had used two variables (`music` and `fade`) without declaring them. One of its own edits had silently failed, so every click ended in a `music is not defined` error before the button could update.
+- **What I did instead:** I reported that the button seemed always on or always off. It traced the clicks in a test browser, found the error, and added the two missing lines. It then checked on, off, clicking elsewhere, and reloading with Sound saved as on.
+- **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/7a1dcc4
+
 ## 3. Who wrote what
 
 Most of the code in this project was written by the AI. The parts below are mine. I typed them myself, using my own m5a3 activity as a reference, and fixed them after review.
@@ -218,6 +293,7 @@ Most of the code in this project was written by the AI. The parts below are mine
     - Then one `INSERT INTO projects (...) VALUES` lists the columns once, followed by one row per project, separated by commas. The AI wrote the first row as the pattern to copy, and I typed the other rows myself (later I swapped one project and added another). My first try repeated the `INSERT` line for every row, which is not how a multi-row insert works.
     - The tech list is a PostgreSQL text array, written `ARRAY['React', 'Vite']`. SQL uses single quotes for text, not the double quotes JSON uses, and that was my other mistake.
     - The text itself is my own: the problem each project solves and what I built.
+    - On 11 October I added two `UPDATE` lines at the end of the file. They fill the new `screenshots` column for HandsFree and AIRP. Those two lines are deprecated; my rows above them did not change.
 
 ### Written by me: the three SQL queries (`server/projectsRepo.js`, `server/messagesRepo.js`)
 
@@ -235,7 +311,7 @@ Most of the code in this project was written by the AI. The parts below are mine
 
 - **File:** `client/src/api/seed.json`
 - **Commit:** https://github.com/JCDC0/Personal-Portfolio-SciFiTerminal/commit/b2e9bb9
-- **What it does and why it is built this way:** This is the demo-mode data used by the GitHub Pages site. Each project has the same eight fields as my `projects` table (`id`, `title`, `problem`, `summary`, `tech`, `image_url`, `live_url`, `repo_url`), so the database in week 2 could hold exactly the same data. The problem/summary split is from my proposal: a recruiter should see what problem I solved before what I built.
+- **What it does and why it is built this way:** This is the demo-mode data used by the GitHub Pages site. Each project has the same eight fields as my `projects` table (`id`, `title`, `problem`, `summary`, `tech`, `image_url`, `live_url`, `repo_url`), so the database in week 2 could hold exactly the same data. On 11 October the AI added a ninth field, `screenshots`, to HandsFree and AIRP. The problem/summary split is from my proposal: a recruiter should see what problem I solved before what I built.
 
 ### The AI-written part I understand best: `server/server.js`
 
